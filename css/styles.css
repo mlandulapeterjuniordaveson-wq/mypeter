@@ -1,0 +1,2673 @@
+/* ═══════════════════════════════════════════════════════════
+   KUMSIKA V5 — PRODUCTION READY PWA
+   Malawi's #1 Marketplace · O-Techy Company 2026
+   Full Open Sans · 100vh responsive · Clean white & dark modes
+═══════════════════════════════════════════════════════════ */
+
+/* ── DESIGN TOKENS ────────────────────────────────────────── */
+:root {
+  /* ── MALAWI BRAND COLORS ───────────────────────────────── */
+  --R: #CE1126; --R-bright: #E8192C; --R-dim: rgba(206,17,38,.10); --R-deep: #A50E1F;
+  --G: #339E35; --G-bright: #3DB33F; --G-dim: rgba(51,158,53,.11); --G-glow: rgba(61,179,63,.28);
+  --G-rich: rgba(51,158,53,.18);
+  --Y: #F5A623; --Y-dim: rgba(245,166,35,.12);
+  --W: #FFFFFF; --BK: #0A0A0A;
+
+  /* ── DEFAULT: MALAWI LIGHT (Red/White/Green/Black) ──── */
+  --bg: #F6F6F4; --surface: #FFFFFF; --surface2: #F0F0EE; --surface3: #E8E8E6;
+  --border: rgba(0,0,0,.08); --border2: rgba(0,0,0,.13); --border3: rgba(0,0,0,.20);
+  --muted: rgba(0,0,0,.38); --muted2: rgba(0,0,0,.60);
+  --text: #0A0A0A; --text2: rgba(0,0,0,.72);
+  --shadow-sm: 0 1px 6px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 20px rgba(0,0,0,.09), 0 1px 6px rgba(0,0,0,.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.13), 0 4px 12px rgba(0,0,0,.08);
+  --shadow-glow: 0 0 0 1px rgba(51,158,53,.15), 0 4px 20px rgba(51,158,53,.12);
+
+  /* ── TYPOGRAPHY ─────────────────────────────────────── */
+  --font: 'Open Sans', sans-serif; --font-display: 'Syne', sans-serif;
+
+  /* ── LAYOUT ─────────────────────────────────────────── */
+  --nav-h: 72px; --topbar-h: 60px;
+  --radius: 16px; --radius-sm: 12px; --radius-xs: 8px;
+
+  /* ── TRANSITIONS ─────────────────────────────────────── */
+  --ease: .15s cubic-bezier(.4,0,.2,1);
+  --spring: .3s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── WHITE THEME ─────────────────────────────────────────── */
+/* ── DARK / AMOLED THEME ─────────────────────────────────── */
+[data-theme="amoled"] {
+  --bg: #000000; --surface: #0e0e0e; --surface2: #161616; --surface3: #1e1e1e;
+  --border: rgba(255,255,255,.07); --border2: rgba(255,255,255,.12); --border3: rgba(255,255,255,.18);
+  --muted: rgba(255,255,255,.32); --muted2: rgba(255,255,255,.56);
+  --text: #FFFFFF; --text2: rgba(255,255,255,.78);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.55);
+  --shadow-md: 0 6px 28px rgba(0,0,0,.65), 0 2px 8px rgba(0,0,0,.40);
+  --shadow-lg: 0 16px 50px rgba(0,0,0,.80), 0 4px 16px rgba(0,0,0,.50);
+  --shadow-glow: 0 0 0 1px rgba(61,179,63,.10), 0 6px 28px rgba(51,158,53,.18);
+}
+[data-theme="white"] body { background: var(--bg); }
+[data-theme="amoled"] .topbar,
+[data-theme="amoled"] .nav,
+[data-theme="amoled"] .page-header { background: rgba(10,10,10,.95) !important; }
+[data-theme="amoled"] .fld input,
+[data-theme="amoled"] .fld select,
+[data-theme="amoled"] .fld textarea,
+[data-theme="amoled"] .f-input { color: #fff; background: #1a1a1a; border-color: rgba(255,255,255,.15); }
+[data-theme="amoled"] .fld select option { background: #1a1a1a; color: #fff; }
+[data-theme="amoled"] .p-card,
+[data-theme="amoled"] .shop-card,
+[data-theme="amoled"] .feat-card { box-shadow: 0 4px 20px rgba(0,0,0,.6); }
+[data-theme="amoled"] .sort-pill { background: #1a1a1a; border-color: rgba(255,255,255,.15); color: rgba(255,255,255,.75); }
+[data-theme="amoled"] .cat-chip { background: #1a1a1a; border-color: rgba(255,255,255,.15); color: rgba(255,255,255,.75); }
+[data-theme="amoled"] .topbar-btn,
+[data-theme="amoled"] .back-btn { background: #1a1a1a; border-color: rgba(255,255,255,.15); color: #fff; }
+[data-theme="amoled"] .conv-item:active { background: #1a1a1a; }
+[data-theme="amoled"] .menu-row:active { background: #1a1a1a; }
+[data-theme="amoled"] .modal-sheet,
+[data-theme="amoled"] .confirm-card { background: #111; }
+[data-theme="amoled"] .auth-hero { background: #0a0a0a; }
+
+/* ── RESET & BASE ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+html {
+  height: 100%; font-size: 16px;
+  scroll-behavior: smooth;
+}
+body {
+  width: 100%; min-height: 100%;
+  font-family: var(--font); background: var(--bg);
+  /* NO overflow:hidden on body — allow mobile browser chrome */
+}
+
+/* ── APP SHELL ────────────────────────────────────────────── */
+#shell {
+  position: relative;
+  width: 100%; max-width: 430px;
+  height: 100dvh; /* dynamic viewport height — fixes iOS safari */
+  height: 100svh; /* small viewport height fallback */
+  min-height: -webkit-fill-available; /* iOS Safari fix */
+  margin: 0 auto;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  overflow: hidden; /* clip screens inside shell */
+  contain: strict; /* performance */
+}
+
+/* Desktop centered card */
+@media (min-width: 460px) {
+  body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #E8E8E6; }
+  #shell { border-radius: 40px; box-shadow: 0 40px 90px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.05); }
+  .det-cta, .toast, .confirm-modal, .modal-backdrop { position: absolute !important; }
+}
+
+/* Noise grain overlay */
+#shell::after {
+  content: ''; position: absolute; inset: 0;
+  pointer-events: none; z-index: 9997; opacity: .018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 100px 100px;
+}
+
+/* ── SCREEN SYSTEM ────────────────────────────────────────── */
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s cubic-bezier(.4,0,.2,1), transform .28s cubic-bezier(.4,0,.2,1);
+  transform: translateX(28px) scale(.984);
+  will-change: transform, opacity;
+  overflow: hidden; /* clip scrollable children */
+}
+.screen.active { opacity: 1; pointer-events: all; transform: none; }
+.screen.slide-back { transform: translateX(-28px) scale(.984); }
+
+/* ── SCROLLABLE AREAS ─────────────────────────────────────── */
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(var(--nav-h) + 12px);
+  overscroll-behavior: contain;
+}
+.scroll::-webkit-scrollbar { display: none; }
+.scroll-free {
+  flex: 1; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.scroll-free::-webkit-scrollbar { display: none; }
+
+/* ── OFFLINE BAR ──────────────────────────────────────────── */
+.offline-bar {
+  display: none; background: var(--R); color: #fff;
+  text-align: center; font-size: 12px; font-weight: 700;
+  padding: 6px; flex-shrink: 0; z-index: 9999; position: relative;
+}
+.offline-bar.show { display: block; }
+
+/* ── TOAST ────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--surface3); color: var(--text); padding: 11px 20px;
+  border-radius: 24px; font-size: 13px; font-weight: 600; font-family: var(--font);
+  border: 1px solid var(--border2); box-shadow: var(--shadow-md);
+  opacity: 0; pointer-events: none; z-index: 10000; white-space: nowrap;
+  transition: opacity .22s, transform .22s;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.g { background: rgba(0,128,0,.9); border-color: rgba(0,200,0,.3); }
+.toast.r { background: rgba(200,0,0,.9); border-color: rgba(255,0,0,.2); }
+.toast.y { background: rgba(180,120,0,.9); border-color: rgba(245,166,35,.3); }
+
+/* ── TOPBAR ───────────────────────────────────────────────── */
+.topbar {
+  flex-shrink: 0; height: var(--topbar-h);
+  background: rgba(255,255,255,.92); backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  display: flex; align-items: center; padding: 0 14px; gap: 10px;
+  border-bottom: 1px solid var(--border); position: relative; z-index: 10;
+}
+.topbar-flag { width: 32px; height: 32px; border-radius: 9px; overflow: hidden; flex-shrink: 0; }
+.topbar-brand { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--text); flex: 1; letter-spacing: -.3px; }
+.topbar-brand em { color: var(--G-bright); font-style: normal; }
+.topbar-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; cursor: pointer; position: relative;
+  transition: background var(--ease), transform var(--ease); flex-shrink: 0;
+}
+.topbar-btn:active { background: var(--surface3); transform: scale(.9); }
+.dot-badge {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--R); border: 1.5px solid var(--surface);
+}
+.page-header {
+  flex-shrink: 0;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 13px 14px; display: flex; align-items: center; gap: 12px;
+}
+.page-header h2 { font-family: var(--font-display); font-size: 17px; font-weight: 800; color: var(--text); flex: 1; }
+.back-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 15px; color: var(--text);
+  flex-shrink: 0; transition: background var(--ease), transform var(--ease);
+}
+.back-btn:active { background: var(--surface3); transform: scale(.88); }
+
+/* ── BOTTOM NAV ────────────────────────────────────────────── */
+.nav {
+  flex-shrink: 0; height: var(--nav-h);
+  background: rgba(255,255,255,.97); backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 4px;
+  position: relative; z-index: 10;
+}
+.nav::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,rgba(0,200,0,.2),transparent); }
+.nav-item { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; background: none; border: none; position: relative; transition: all .18s; font-family: var(--font); }
+.nav-item .ni { font-size: 20px; transition: transform .22s var(--spring); }
+.nav-item .nl { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: .4px; text-transform: uppercase; transition: color .18s; }
+.nav-item.on .nl { color: var(--G-bright); }
+.nav-item.on .ni { transform: translateY(-2px) scale(1.1); }
+.nav-item.on::before { content: ''; position: absolute; top: 0; left: 50%; width: 28px; height: 3px; border-radius: 0 0 4px 4px; background: var(--G-bright); transform: translateX(-50%); box-shadow: 0 0 10px rgba(0,220,0,.5); }
+.nav-fab-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+.nav-fab {
+  width: 54px; height: 54px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--R-deep), var(--R-bright));
+  border: none; display: flex; align-items: center; justify-content: center;
+  font-size: 26px; color: #fff; cursor: pointer; margin-top: -18px;
+  box-shadow: 0 8px 28px rgba(206,17,38,.45), 0 0 0 3px var(--surface);
+  transition: transform var(--spring), box-shadow .2s; position: relative;
+}
+.nav-fab:active { transform: scale(.86); }
+
+/* ── FORMS ───────────────────────────────────────────────── */
+.f-label { font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--muted2); margin-bottom: 5px; display: block; }
+.f-input {
+  width: 100%; background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 13px 15px;
+  font-size: 15px; font-family: var(--font); color: var(--text);
+  outline: none; transition: border-color .22s, box-shadow .22s;
+}
+.f-input::placeholder { color: var(--muted); }
+.f-input:focus { border-color: var(--G); box-shadow: 0 0 0 3px rgba(0,170,0,.1); }
+.f-input.err { border-color: var(--R); box-shadow: 0 0 0 3px rgba(230,0,0,.08); }
+.f-input.ok { border-color: var(--G-bright); }
+.f-err { font-size: 11px; color: var(--R); font-weight: 600; margin-top: 4px; display: none; }
+.f-err.show { display: block; }
+.fld { display: flex; flex-direction: column; gap: 5px; }
+.fld label { font-size: 11px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; color: var(--muted2); }
+.fld input, .fld select, .fld textarea {
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 14px;
+  font-size: 14px; font-family: var(--font); color: var(--text);
+  outline: none; transition: border-color .22s, box-shadow .22s; width: 100%;
+}
+.fld input:focus, .fld select:focus, .fld textarea:focus { border-color: rgba(0,180,0,.6); box-shadow: 0 0 0 3px rgba(0,180,0,.08); }
+.fld input::placeholder, .fld textarea::placeholder { color: var(--muted); }
+.fld select { -webkit-appearance: none; appearance: none; }
+.fld select option { background: #1a1a1a; color: #fff; }
+.fld textarea { resize: none; min-height: 84px; line-height: 1.5; }
+.pw-wrap { position: relative; }
+.pw-wrap .f-input { padding-right: 46px; }
+.pw-eye { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); font-size: 17px; cursor: pointer; color: var(--muted); }
+.div-line { text-align: center; position: relative; color: var(--muted); font-size: 12px; font-weight: 600; margin: 4px 0; }
+.div-line::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border2); }
+.div-line span { background: var(--bg); padding: 0 12px; position: relative; }
+.strength-bar { height: 3px; background: var(--surface3); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+.strength-fill { height: 100%; width: 0; border-radius: 3px; transition: width .3s, background .3s; }
+.strength-label { font-size: 10px; font-weight: 700; margin-top: 3px; }
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn-g {
+  width: 100%; padding: 15px; background: linear-gradient(135deg, var(--R-deep), var(--R), var(--R-bright));
+  color: #fff; border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 700; font-family: var(--font); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: filter .18s, transform .13s; box-shadow: 0 4px 20px rgba(206,17,38,.35);
+  position: relative; overflow: hidden;
+}
+.btn-g::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg,rgba(255,255,255,.1),transparent 60%); pointer-events: none; }
+.btn-g:active { filter: brightness(.9); transform: scale(.98); }
+.btn-g:disabled { opacity: .5; pointer-events: none; }
+.btn-ghost {
+  width: 100%; padding: 14px; background: transparent;
+  color: var(--G-bright); border: 1.5px solid rgba(0,180,0,.35);
+  border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+  font-family: var(--font); cursor: pointer; transition: background .18s, border-color .18s;
+}
+.btn-ghost:active { background: var(--G-dim); }
+.btn-r {
+  width: 100%; padding: 13px; background: var(--R-dim);
+  color: var(--R-bright); border: 1.5px solid rgba(230,0,0,.28);
+  border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: background .18s;
+}
+.btn-r:active { background: rgba(230,0,0,.22); }
+.btn-y {
+  width: 100%; padding: 13px; background: var(--Y-dim);
+  color: var(--Y); border: 1.5px solid rgba(245,166,35,.28);
+  border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
+  font-family: var(--font); cursor: pointer;
+}
+.btn-wa {
+  width: 100%; padding: 13px; background: rgba(37,211,102,.12);
+  color: #25D366; border: 1.5px solid rgba(37,211,102,.3);
+  border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
+  font-family: var(--font); cursor: pointer;
+}
+.btn-sm {
+  padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700;
+  cursor: pointer; border: 1px solid var(--border2); font-family: var(--font);
+  background: var(--surface2); color: var(--text2); white-space: nowrap;
+}
+.btn-sm-g { background: var(--G-dim); color: var(--G-bright); border-color: rgba(0,180,0,.3); }
+.btn-sm-r { background: var(--R-dim); color: var(--R-bright); border-color: rgba(230,0,0,.3); }
+.btn-sm-y { background: var(--Y-dim); color: var(--Y); border-color: rgba(245,166,35,.3); }
+.spinner { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── BADGES ──────────────────────────────────────────────── */
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 800; letter-spacing: .4px; }
+.badge-g { background: rgba(0,180,0,.12); color: var(--G-bright); border: 1px solid rgba(0,180,0,.2); }
+.badge-r { background: var(--R-dim); color: var(--R-bright); border: 1px solid rgba(230,0,0,.2); }
+.badge-y { background: var(--Y-dim); color: var(--Y); border: 1px solid rgba(245,166,35,.2); }
+.badge-grey { background: rgba(255,255,255,.06); color: var(--muted2); border: 1px solid var(--border2); }
+
+/* ── TOGGLE ──────────────────────────────────────────────── */
+.toggle {
+  width: 46px; height: 26px; border-radius: 13px; background: var(--surface3);
+  border: 1.5px solid var(--border2); position: relative; cursor: pointer;
+  transition: background .22s, border-color .22s; flex-shrink: 0;
+}
+.toggle::after {
+  content: ''; position: absolute; left: 3px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; border-radius: 50%; background: var(--muted);
+  transition: left .22s var(--spring), background .22s;
+}
+.toggle.on { background: rgba(0,180,0,.2); border-color: rgba(0,200,0,.4); }
+.toggle.on::after { left: calc(100% - 21px); background: var(--G-bright); }
+.toggle-row { display: flex; align-items: center; gap: 14px; padding: 4px 0; }
+.tl { flex: 1; } .tn { font-size: 14px; font-weight: 700; color: var(--text); } .ts { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ── MODALS ──────────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.72);
+  z-index: 500; display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none; transition: opacity .24s;
+  backdrop-filter: blur(4px);
+}
+.modal-backdrop.show { opacity: 1; pointer-events: all; }
+.modal-sheet {
+  width: 100%; max-height: 88vh; background: var(--surface);
+  border-radius: 24px 24px 0 0; padding: 8px 18px 32px;
+  border-top: 1px solid var(--border2); overflow-y: auto;
+}
+.modal-sheet::-webkit-scrollbar { display: none; }
+.modal-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--border3); margin: 10px auto 14px; }
+.modal-title { font-family: var(--font-display); font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 16px; }
+.confirm-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 600;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .22s;
+  backdrop-filter: blur(6px);
+}
+.confirm-modal.show { opacity: 1; pointer-events: all; }
+.confirm-card { background: var(--surface); border-radius: 20px; padding: 24px; margin: 20px; width: calc(100% - 40px); max-width: 340px; border: 1px solid var(--border2); }
+.confirm-card h3 { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.confirm-card p { font-size: 13px; color: var(--muted2); line-height: 1.5; margin-bottom: 18px; }
+.confirm-btns { display: flex; gap: 10px; }
+
+/* ── SEARCH ──────────────────────────────────────────────── */
+.search-wrap { padding: 10px 12px 8px; background: var(--bg); flex-shrink: 0; }
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2); border: 1.5px solid var(--border2);
+  border-radius: 14px; padding: 10px 14px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.search-box:focus-within { border-color: rgba(0,180,0,.5); box-shadow: 0 0 0 3px rgba(0,150,0,.08); }
+.search-box .ico { font-size: 16px; color: var(--muted); flex-shrink: 0; }
+.search-box input {
+  flex: 1; background: none; border: none; outline: none;
+  font-size: 14px; font-family: var(--font); color: var(--text);
+}
+.search-box input::placeholder { color: var(--muted); }
+.search-filter-btn {
+  background: var(--G-dim); border: 1px solid rgba(0,180,0,.25);
+  border-radius: 9px; padding: 6px 12px; font-size: 11px; font-weight: 700;
+  color: var(--G-bright); cursor: pointer; flex-shrink: 0; font-family: var(--font);
+  transition: background .15s;
+}
+.search-filter-btn:active { background: var(--G-rich); }
+.sh-header { display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.sh-header a { color: var(--G-bright); cursor: pointer; text-transform: none; letter-spacing: 0; }
+.sh-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sh-chip { display: flex; align-items: center; gap: 5px; padding: 5px 10px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 20px; font-size: 11px; color: var(--text2); cursor: pointer; }
+.sh-x { color: var(--muted); font-size: 10px; }
+.sort-bar { display: flex; align-items: center; gap: 6px; padding: 0 12px 8px; overflow-x: auto; flex-shrink: 0; }
+.sort-bar::-webkit-scrollbar { display: none; }
+.sort-label { font-size: 11px; font-weight: 700; color: var(--muted); flex-shrink: 0; text-transform: uppercase; letter-spacing: .4px; }
+.sort-pill {
+  padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  background: var(--surface2); border: 1px solid var(--border2); color: var(--muted2);
+  cursor: pointer; white-space: nowrap; font-family: var(--font);
+  transition: background .15s, color .15s, border-color .15s;
+}
+.sort-pill.on { background: var(--G-dim); color: var(--G-bright); border-color: rgba(0,180,0,.35); }
+.cats { display: flex; gap: 7px; padding: 0 12px 10px; overflow-x: auto; flex-shrink: 0; }
+.cats::-webkit-scrollbar { display: none; }
+.cat-chip {
+  padding: 7px 13px; border-radius: 20px; font-size: 12px; font-weight: 700;
+  background: var(--surface2); border: 1.5px solid var(--border2); color: var(--muted2);
+  cursor: pointer; white-space: nowrap; font-family: var(--font);
+  transition: all .18s;
+}
+.cat-chip.on { background: var(--G-dim); color: var(--G-bright); border-color: rgba(0,200,0,.3); }
+
+/* ── PRODUCT CARDS ────────────────────────────────────────── */
+.p-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 12px; }
+.p-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; cursor: pointer;
+  transition: transform .18s, box-shadow .18s;
+}
+.p-card:active { transform: scale(.97); }
+.p-img {
+  height: 130px; background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 56px; position: relative;
+}
+.p-fav {
+  position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,.4);
+  border: none; border-radius: 8px; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer;
+}
+.p-verified { position: absolute; bottom: 6px; left: 6px; background: rgba(0,200,0,.2); color: var(--G-bright); border: 1px solid rgba(0,200,0,.3); border-radius: 5px; font-size: 9px; font-weight: 800; padding: 2px 6px; }
+.p-body { padding: 10px; }
+.p-name { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.35; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.p-price { font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--G-bright); margin-bottom: 4px; }
+.p-loc { font-size: 10px; color: var(--muted); }
+.p-views { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* ── FEATURED CARDS ───────────────────────────────────────── */
+.h-scroll { display: flex; gap: 10px; padding: 0 12px 4px; overflow-x: auto; }
+.h-scroll::-webkit-scrollbar { display: none; }
+.feat-card {
+  flex-shrink: 0; width: 160px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; cursor: pointer;
+}
+.feat-img { height: 110px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 50px; position: relative; }
+.feat-tag {
+  position: absolute; top: 7px; left: 7px;
+  font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 6px;
+  text-transform: uppercase; letter-spacing: .4px;
+}
+.feat-tag.hot { background: var(--R-dim); color: var(--R-bright); border: 1px solid rgba(230,0,0,.2); }
+.feat-tag.new { background: var(--G-dim); color: var(--G-bright); border: 1px solid rgba(0,180,0,.2); }
+.feat-tag.sale { background: var(--Y-dim); color: var(--Y); border: 1px solid rgba(245,166,35,.2); }
+.feat-fav { position: absolute; top: 7px; right: 7px; background: rgba(0,0,0,.4); border: none; border-radius: 7px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; }
+.feat-rank { font-size: 10px; font-weight: 700; color: var(--muted); }
+.feat-body { padding: 9px; }
+.feat-name { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.feat-price { font-family: var(--font-display); font-size: 13px; font-weight: 800; color: var(--G-bright); }
+.feat-loc { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* ── STATS RIBBON ─────────────────────────────────────────── */
+.stats-ribbon { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; padding: 12px; margin-bottom: 4px; }
+.stat-cell { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+.stat-num { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--G-bright); }
+.stat-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+
+/* ── SECTION HEADERS ─────────────────────────────────────── */
+.sec { display: flex; align-items: center; padding: 12px 14px 8px; }
+.sec h2 { font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--text); flex: 1; }
+.sec a { font-size: 12px; color: var(--G-bright); font-weight: 700; cursor: pointer; }
+.p-sec-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted2); padding: 12px 14px 4px; }
+
+/* ── HERO BANNER ─────────────────────────────────────────── */
+.hero-banner {
+  margin: 0 12px 12px; height: 80px; border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(0,100,0,.3), rgba(0,80,0,.15));
+  border: 1px solid rgba(0,200,0,.18);
+  display: flex; align-items: center; gap: 14px; padding: 0 16px;
+  cursor: pointer; transition: opacity .18s;
+}
+.hero-banner:active { opacity: .85; }
+.banner-icon { font-size: 32px; }
+.banner-text { flex: 1; }
+.banner-text h3 { font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--text); }
+.banner-text p { font-size: 11px; color: var(--muted2); margin-top: 2px; }
+.banner-btn { padding: 8px 16px; background: var(--G); color: #fff; border: none; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+
+/* ── PRODUCT DETAIL ──────────────────────────────────────── */
+.det-gallery {
+  flex-shrink: 0; height: 260px; background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 90px; position: relative; overflow: hidden;
+}
+.det-back {
+  position: absolute; top: 14px; left: 14px; z-index: 5;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #fff; cursor: pointer; backdrop-filter: blur(8px);
+}
+.det-share {
+  position: absolute; top: 14px; right: 14px; z-index: 5;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; color: #fff; cursor: pointer; backdrop-filter: blur(8px);
+}
+.det-img-counter { position: absolute; bottom: 14px; left: 14px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 10px; backdrop-filter: blur(8px); }
+.det-dots { position: absolute; bottom: 14px; right: 14px; display: flex; gap: 5px; }
+.det-dot { width: 6px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.3); transition: background .2s, width .2s; }
+.det-dot.on { background: var(--G-bright); width: 16px; }
+.det-body { flex: 1; overflow-y: auto; padding: 16px; }
+.det-body::-webkit-scrollbar { display: none; }
+.det-cat-tag { display: inline-block; background: var(--G-dim); color: var(--G-bright); border: 1px solid rgba(0,200,0,.2); border-radius: 7px; font-size: 10px; font-weight: 800; padding: 3px 9px; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 9px; }
+.det-title { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.25; margin-bottom: 8px; }
+.det-price { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--G-bright); margin-bottom: 8px; }
+.det-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 12px; color: var(--muted2); }
+.det-views { margin-left: auto; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 3px 9px; font-size: 11px; font-weight: 700; color: var(--muted2); }
+.det-wa-btn {
+  display: flex; align-items: center; gap: 10px; padding: 13px 16px;
+  background: rgba(37,211,102,.1); border: 1px solid rgba(37,211,102,.25);
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; font-weight: 700;
+  color: #25D366; margin-bottom: 12px; transition: background .18s;
+}
+.det-wa-btn:active { background: rgba(37,211,102,.2); }
+.det-seller {
+  display: flex; align-items: center; gap: 12px; padding: 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 14px;
+}
+.seller-av { width: 42px; height: 42px; border-radius: 12px; background: var(--G-dim); border: 1px solid rgba(0,200,0,.2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.seller-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+.seller-info { flex: 1; }
+.sname { font-size: 14px; font-weight: 700; color: var(--text); }
+.smeta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.seller-stars { font-size: 12px; font-weight: 700; color: var(--Y); flex-shrink: 0; }
+.seller-stars span { display: block; font-size: 10px; color: var(--muted); font-weight: 400; }
+.det-desc { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+.det-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.d-tag { padding: 5px 11px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; font-size: 11px; font-weight: 600; color: var(--text2); }
+.det-cta {
+  flex-shrink: 0; padding: 12px 14px; background: var(--bg);
+  border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center;
+}
+.det-save {
+  width: 48px; height: 48px; border-radius: 13px;
+  background: var(--surface2); border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; cursor: pointer; flex-shrink: 0; transition: transform .2s;
+}
+.det-save:active { transform: scale(.88); }
+.det-save.on { border-color: rgba(230,0,0,.4); background: rgba(230,0,0,.08); }
+
+/* ── SHOPS ───────────────────────────────────────────────── */
+.shop-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; cursor: pointer;
+  transition: transform .18s; margin-bottom: 11px;
+}
+.shop-card:active { transform: scale(.99); }
+.shop-cover { height: 84px; background: linear-gradient(135deg,var(--surface2),var(--surface3)); display: flex; align-items: center; justify-content: center; font-size: 38px; position: relative; }
+.shop-cover-glow { position: absolute; inset: 0; background: linear-gradient(135deg,rgba(0,180,0,.07),transparent); }
+.shop-info { padding: 12px; }
+.shop-logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.shop-logo { width: 42px; height: 42px; border-radius: 11px; background: var(--G-dim); border: 1px solid rgba(0,200,0,.2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.shop-name { font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--text); }
+.shop-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.shop-stats-row { display: flex; gap: 12px; align-items: center; }
+.shop-stat { font-size: 12px; color: var(--muted2); }
+.shop-stat strong { color: var(--text); font-weight: 700; }
+.shop-viewer-count { font-size: 11px; color: var(--muted); margin-left: auto; }
+.shop-sub-badge { padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; }
+.shop-subs-warning { background: rgba(245,166,35,.1); border: 1px solid rgba(245,166,35,.3); border-radius: var(--radius-sm); padding: 10px 14px; margin: 0 14px 12px; font-size: 12px; color: var(--Y); font-weight: 600; display: none; }
+.shop-search { padding: 10px 12px 6px; }
+.shop-search input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border2); border-radius: 12px; padding: 10px 14px; font-size: 14px; color: var(--text); outline: none; font-family: var(--font); }
+.shop-search input::placeholder { color: var(--muted); }
+.shop-contact-btns { display: flex; gap: 10px; padding: 0 14px 12px; }
+.shop-contact-btns .btn-g, .shop-contact-btns .btn-wa { flex: 1; }
+.shop-detail-products { padding: 0 12px; }
+
+/* ── SHOP CREATE ─────────────────────────────────────────── */
+.shop-form-wrap { padding: 16px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 80px; }
+.plan-card { border-radius: var(--radius); border: 1.5px solid rgba(0,180,0,.3); background: var(--G-dim); padding: 16px; }
+.plan-name { font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--G-bright); }
+.plan-price { font-size: 24px; font-weight: 800; color: var(--text); margin: 8px 0 4px; }
+.plan-price span { font-size: 12px; color: var(--muted); font-weight: 400; }
+.plan-feature { font-size: 12px; color: var(--muted2); margin: 3px 0; }
+
+/* ── MY SHOP ─────────────────────────────────────────────── */
+.my-shop-product { display: flex; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.msp-img { width: 58px; height: 58px; border-radius: 11px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+.msp-info { flex: 1; }
+.msp-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.msp-price { font-size: 14px; font-weight: 800; color: var(--G-bright); margin-bottom: 4px; font-family: var(--font-display); }
+.msp-meta { font-size: 10px; color: var(--muted); margin-bottom: 7px; }
+.msp-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+.msp-hidden .msp-img { opacity: .4; }
+.msp-hidden .msp-name { color: var(--muted2); }
+.my-shop-header { padding: 14px 14px 10px; }
+.my-shop-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; padding: 0 14px 14px; }
+.mss-cell { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+.mss-num { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--G-bright); }
+.mss-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; font-weight: 600; }
+
+/* ── SELL SCREEN ─────────────────────────────────────────── */
+.sell-top { background: var(--surface); border-bottom: 1px solid var(--border); padding: 13px 14px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.sell-top h2 { font-family: var(--font-display); font-size: 17px; font-weight: 800; color: var(--text); flex: 1; }
+.sell-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; padding-bottom: 60px; }
+.photos-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.photo-slot { width: 80px; height: 80px; border-radius: 11px; border: 1.5px dashed var(--border2); background: var(--surface2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--muted); font-size: 10px; font-weight: 600; transition: border-color .2s; }
+.photo-slot:active { border-color: var(--G); }
+.photo-slot span { font-size: 20px; }
+.photo-slot.disabled { opacity: .4; pointer-events: none; }
+.photo-thumb { width: 80px; height: 80px; border-radius: 11px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 32px; position: relative; overflow: hidden; }
+.photo-rm { position: absolute; top: -1px; right: -1px; width: 20px; height: 20px; border-radius: 50%; background: var(--R); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; font-weight: 700; }
+.photo-counter { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); font-weight: 700; }
+.photo-counter .pc-num { color: var(--G-bright); }
+.ai-cta { display: flex; align-items: center; gap: 11px; padding: 12px; background: var(--G-dim); border: 1px solid rgba(0,180,0,.22); border-radius: var(--radius-sm); cursor: pointer; }
+.ai-cta:active { background: var(--G-rich); }
+.ai-cta-icon { width: 36px; height: 36px; border-radius: 9px; background: rgba(0,180,0,.18); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.ai-cta-text .at1 { font-size: 13px; font-weight: 700; color: var(--G-bright); }
+.ai-cta-text .at2 { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.ai-cta .arr2 { color: var(--G-bright); font-size: 14px; margin-left: auto; }
+.price-row { display: flex; gap: 9px; }
+.price-row .fld { flex: 1; }
+.sell-sub-gate { background: var(--Y-dim); border: 1px solid rgba(245,166,35,.3); border-radius: var(--radius-sm); padding: 14px; display: none; }
+.sell-sub-gate p { font-size: 13px; color: var(--Y); font-weight: 600; margin-bottom: 10px; }
+
+/* ── MESSAGES / CHAT ─────────────────────────────────────── */
+.msgs-top { background: rgba(255,255,255,.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 13px 14px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.msgs-top h2 { font-family: var(--font-display); font-size: 17px; font-weight: 800; color: var(--text); flex: 1; }
+.conv-item { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .13s; }
+.conv-item:active { background: var(--surface2); }
+.conv-av { width: 46px; height: 46px; border-radius: 14px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; position: relative; }
+.conv-online { position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--G-bright); border: 2px solid var(--bg); }
+.conv-body { flex: 1; min-width: 0; }
+.conv-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.conv-preview { font-size: 12px; color: var(--muted2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.conv-time { font-size: 10px; color: var(--muted); }
+.conv-badge { background: var(--G); color: #fff; width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
+
+.chat-top { background: rgba(255,255,255,.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 12px 14px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.chat-top h3 { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+.chat-top .cmeta { font-size: 11px; color: var(--G-bright); font-weight: 600; }
+.c-call { width: 36px; height: 36px; border-radius: 10px; background: var(--G-dim); border: 1px solid rgba(0,180,0,.2); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+.chat-box { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.chat-box::-webkit-scrollbar { display: none; }
+.msg { display: flex; flex-direction: column; max-width: 78%; }
+.msg.me { align-self: flex-end; align-items: flex-end; }
+.msg.them { align-self: flex-start; align-items: flex-start; }
+.bubble { padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.45; }
+.msg.me .bubble { background: linear-gradient(135deg,rgba(0,160,0,.85),rgba(0,120,0,.9)); color: #fff; border-bottom-right-radius: 4px; }
+.msg.them .bubble { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); border-bottom-left-radius: 4px; }
+.m-time { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.typing-dots { display: none; align-items: center; gap: 4px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 14px 14px 14px 4px; max-width: 64px; }
+.typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted2); animation: typingDot 1.2s infinite; }
+.typing-dots span:nth-child(2) { animation-delay: .2s; }
+.typing-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes typingDot { 0%,80%,100% { transform: scale(.8); opacity:.5; } 40% { transform: scale(1.1); opacity:1; } }
+.m-product { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 10px; display: flex; gap: 10px; cursor: pointer; }
+.m-product-img { width: 48px; height: 48px; background: var(--surface2); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.ai-suggestion { display: flex; gap: 6px; padding: 7px 14px; overflow-x: auto; flex-shrink: 0; }
+.ai-suggestion::-webkit-scrollbar { display: none; }
+.ai-suggest-chip { flex-shrink: 0; padding: 6px 12px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border2); font-size: 11px; font-weight: 600; color: var(--text2); cursor: pointer; font-family: var(--font); transition: background .13s; }
+.ai-suggest-chip:active { background: var(--G-dim); border-color: rgba(0,200,0,.3); color: var(--G-bright); }
+.chat-inp { background: var(--bg); border-top: 1px solid var(--border); padding: 8px 14px 12px; display: flex; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.c-attach { width: 40px; height: 40px; border-radius: 11px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 17px; cursor: pointer; flex-shrink: 0; }
+.c-text { flex: 1; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 9px 12px; font-size: 14px; font-family: var(--font); color: var(--text); outline: none; resize: none; max-height: 100px; transition: border-color .2s; line-height: 1.4; }
+.c-text:focus { border-color: rgba(0,180,0,.5); }
+.c-text::placeholder { color: var(--muted); }
+.c-send { width: 40px; height: 40px; border-radius: 11px; background: var(--G); border: none; display: flex; align-items: center; justify-content: center; font-size: 17px; color: #fff; cursor: pointer; flex-shrink: 0; transition: transform .15s; }
+.c-send:active { transform: scale(.88); }
+
+/* ── SHELVES ─────────────────────────────────────────────── */
+.shelf-scroll { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
+.shelf-scroll::-webkit-scrollbar { display: none; }
+.shelf-card { background: var(--surface); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); cursor: pointer; }
+.shelf-thumbs { height: 88px; display: flex; overflow: hidden; border-bottom: 1px solid var(--border); }
+.s-thumb { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 30px; background: var(--surface2); border-right: 1px solid var(--border); }
+.s-thumb:last-child { border-right: none; }
+.shelf-info { padding: 10px 13px; display: flex; align-items: center; gap: 10px; }
+.shelf-info .sn { flex: 1; font-size: 14px; font-weight: 700; color: var(--text); }
+.shelf-info .sc { font-size: 11px; color: var(--muted); }
+.add-shelf { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border: 1.5px dashed var(--border2); border-radius: var(--radius); cursor: pointer; color: var(--muted); font-size: 14px; font-weight: 600; }
+
+/* ── NOTIFICATIONS ───────────────────────────────────────── */
+.notif-item { display: flex; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.notif-item.unread { background: rgba(0,180,0,.03); }
+.notif-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.notif-body { flex: 1; }
+.notif-text { font-size: 13px; color: var(--text); line-height: 1.4; font-weight: 500; }
+.notif-text strong { font-weight: 700; }
+.notif-time { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--G-bright); flex-shrink: 0; margin-top: 6px; }
+
+/* ── PROFILE ─────────────────────────────────────────────── */
+.prof-header { padding: 22px 14px 24px; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.prof-header::before { content: ''; position: absolute; top: -50px; left: 50%; transform: translateX(-50%); width: 220px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(0,180,0,.15) 0%, transparent 70%); }
+.prof-av-wrap { position: relative; display: inline-block; margin-bottom: 10px; cursor: pointer; }
+.prof-av { width: 78px; height: 78px; border-radius: 50%; background: var(--G-dim); border: 2.5px solid rgba(0,180,0,.45); display: flex; align-items: center; justify-content: center; font-size: 34px; overflow: hidden; }
+.prof-av img { width: 100%; height: 100%; object-fit: cover; }
+.prof-av-edit { position: absolute; bottom: 0; right: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--G); border: 2px solid var(--surface); display: flex; align-items: center; justify-content: center; font-size: 11px; }
+.prof-name { font-family: var(--font-display); font-size: 19px; font-weight: 800; color: var(--text); }
+.prof-email { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.prof-badges { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+.prof-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; margin-top: 14px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); background: var(--border); }
+.pstat { padding: 10px 8px; text-align: center; background: var(--surface2); }
+.pstat-n { font-family: var(--font-display); font-size: 17px; font-weight: 800; color: var(--text); }
+.pstat-l { font-size: 10px; color: var(--muted); margin-top: 2px; font-weight: 600; }
+.prof-scroll { flex: 1; overflow-y: auto; }
+.prof-scroll::-webkit-scrollbar { display: none; }
+
+/* ── SETTINGS / MENU ROWS ────────────────────────────────── */
+.menu-section { padding: 12px 14px 4px; }
+.menu-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 6px; }
+.menu-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 10px; }
+.menu-row { display: flex; align-items: center; gap: 14px; padding: 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background var(--ease); }
+.menu-row:last-child { border-bottom: none; }
+.menu-row:active { background: var(--surface2); }
+.menu-row-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.menu-row-body { flex: 1; }
+.menu-row-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.menu-row-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.menu-row-right { font-size: 13px; color: var(--muted2); flex-shrink: 0; }
+.rv { font-size: 12px; color: var(--muted2); font-weight: 600; }
+.rv.green { color: var(--G-bright); }
+.rv.red { color: var(--R-bright); }
+.rv.yellow { color: var(--Y); }
+
+/* ── LISTING CARD ────────────────────────────────────────── */
+.listing-card { display: flex; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; }
+.listing-img { width: 64px; height: 64px; border-radius: 11px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; position: relative; overflow: hidden; }
+.listing-info { flex: 1; }
+.listing-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.listing-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+.my-listings-grid { padding: 12px; display: flex; flex-direction: column; gap: 9px; padding-bottom: 20px; }
+
+/* ── AUTH / SPLASH ───────────────────────────────────────── */
+#s-splash { background: #FFFFFF; align-items: center; justify-content: center; z-index: 100; }
+.splash-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 45% at 50% 55%, rgba(0,160,0,.2) 0%, transparent 68%); pointer-events: none; }
+.splash-flag-wrap { position: relative; margin-bottom: 26px; }
+.splash-ring { position: absolute; inset: -16px; border-radius: 50%; border: 1px solid rgba(0,180,0,.28); animation: ringPulse 2.6s ease infinite; }
+.splash-ring2 { position: absolute; inset: -32px; border-radius: 50%; border: 1px solid rgba(0,180,0,.12); animation: ringPulse 2.6s ease infinite .4s; }
+.splash-icon { width: 96px; height: 96px; border-radius: 26px; overflow: hidden; box-shadow: 0 0 60px rgba(0,160,0,.4), 0 20px 50px rgba(0,0,0,.5); animation: iconReveal .85s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes iconReveal { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes ringPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: .35; } }
+.mw-flag { width: 100%; height: 100%; display: flex; flex-direction: column; }
+.mw-black { flex: 1; background: #000; position: relative; display: flex; align-items: center; justify-content: center; }
+.mw-red { flex: 1; background: #CE1126; }
+.mw-green { flex: 1; background: #339E35; }
+.mw-sun { width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle, #FF6644 20%, #CE1126 100%); position: relative; box-shadow: 0 0 18px rgba(230,0,0,.6); }
+.mw-sun::before { content: ''; position: absolute; inset: -10px; border-radius: 50%; background: conic-gradient(from 0deg,#CE1126 0deg 14.4deg,transparent 14.4deg 36deg,#CE1126 36deg 50.4deg,transparent 50.4deg 72deg,#CE1126 72deg 86.4deg,transparent 86.4deg 108deg,#CE1126 108deg 122.4deg,transparent 122.4deg 144deg,#CE1126 144deg 158.4deg,transparent 158.4deg 180deg,#CE1126 180deg 194.4deg,transparent 194.4deg 216deg,#CE1126 216deg 230.4deg,transparent 230.4deg 252deg,#CE1126 252deg 266.4deg,transparent 266.4deg 288deg,#CE1126 288deg 302.4deg,transparent 302.4deg 324deg,#CE1126 324deg 338.4deg,transparent 338.4deg 360deg); opacity: .55; }
+.splash-wordmark { font-family: var(--font-display); font-size: 42px; font-weight: 800; color: #0A1628; letter-spacing: -1.5px; animation: fadeUp .55s .35s both; }
+.splash-wordmark em { color: var(--G-bright); font-style: normal; }
+.splash-sub { font-size: 13px; color: rgba(10,22,40,.50); margin-top: 5px; animation: fadeUp .55s .5s both; }
+.splash-powered { font-size: 11px; color: rgba(10,22,40,.35); margin-top: 3px; animation: fadeUp .55s .65s both; }
+.splash-powered span { color: var(--G-bright); font-weight: 700; }
+.splash-loader { margin-top: 50px; width: 120px; height: 3px; background: rgba(0,0,0,.08); border-radius: 3px; overflow: hidden; animation: fadeUp .55s .75s both; }
+.splash-loader-fill { height: 100%; width: 0; background: linear-gradient(90deg, #339E35, var(--G-bright), #CE1126, var(--G-bright)); border-radius: 3px; animation: loaderFill 2.4s .28s cubic-bezier(.4,0,.2,1) forwards; }
+@keyframes loaderFill { to { width: 100%; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ── LOGIN / SIGNUP ──────────────────────────────────────── */
+#s-login, #s-signup { background: var(--bg); overflow-y: auto; }
+#s-login::-webkit-scrollbar, #s-signup::-webkit-scrollbar { display: none; }
+.auth-hero { background: var(--surface); padding: 40px 20px 36px; position: relative; overflow: hidden; }
+.auth-hero-glow { position: absolute; top: -50px; right: -30px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(0,180,0,.25) 0%, transparent 70%); pointer-events: none; }
+.auth-hero-line { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #339E35, #000, #CE1126); }
+.auth-flag-icon { width: 46px; height: 46px; border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 18px rgba(0,128,0,.28); }
+.auth-hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.22; letter-spacing: -.4px; }
+.auth-hero p { color: var(--muted); font-size: 13px; margin-top: 7px; }
+.auth-form { padding: 20px; display: flex; flex-direction: column; gap: 13px; padding-bottom: 36px; }
+.lang-pill { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 11px 14px; cursor: pointer; }
+.lang-pill .globe { font-size: 15px; }
+.lang-pill span { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+.lang-pill .arr { color: var(--muted); font-size: 10px; }
+
+/* ── LANG SCREEN ─────────────────────────────────────────── */
+.lang-search { padding: 10px 12px; }
+.lang-search input { width: 100%; background: var(--surface2); border: 1.5px solid var(--border2); border-radius: 12px; padding: 10px 14px; font-size: 14px; color: var(--text); outline: none; font-family: var(--font); }
+.lang-search input::placeholder { color: var(--muted); }
+.lang-item { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.lang-item:active { background: var(--surface2); }
+.l-flag { font-size: 24px; }
+.l-text { flex: 1; }
+.l-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.l-native { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.l-check { color: var(--G-bright); font-weight: 700; font-size: 16px; }
+
+/* ── SUBSCRIPTION BANNER ─────────────────────────────────── */
+.sub-banner { margin: 0 12px; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 12px; }
+.sub-banner.active { background: rgba(0,180,0,.07); border: 1px solid rgba(0,180,0,.22); }
+.sub-banner.warning { background: rgba(245,166,35,.07); border: 1px solid rgba(245,166,35,.28); }
+.sub-banner.expired { background: rgba(230,0,0,.07); border: 1px solid rgba(230,0,0,.28); }
+.sub-banner-inner { padding: 11px 13px; display: flex; align-items: center; gap: 11px; }
+.sub-icon { font-size: 20px; flex-shrink: 0; }
+.sub-text { flex: 1; }
+.sub-text .st1 { font-size: 13px; font-weight: 700; color: var(--text); }
+.sub-text .st2 { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.sub-action { font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
+.sub-action.green { color: var(--G-bright); }
+.sub-action.yellow { color: var(--Y); }
+.sub-action.red { color: var(--R-bright); }
+
+/* ── ADMIN ───────────────────────────────────────────────── */
+.admin-tabs { display: flex; gap: 6px; padding: 12px 14px 8px; overflow-x: auto; flex-shrink: 0; }
+.admin-tabs::-webkit-scrollbar { display: none; }
+.admin-tab { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: var(--surface2); border: 1px solid var(--border2); color: var(--muted2); cursor: pointer; white-space: nowrap; font-family: var(--font); }
+.admin-tab.on { background: rgba(150,0,200,.15); color: #cc88ff; border-color: rgba(150,0,200,.3); }
+.admin-overview { padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.admin-stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+.admin-stat-card .asn { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: #cc88ff; }
+.admin-stat-card .asl { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 600; }
+.admin-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.admin-item-icon { width: 40px; height: 40px; border-radius: 11px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.admin-item-body { flex: 1; min-width: 0; }
+.admin-item-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.admin-item-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.admin-item-actions { display: flex; gap: 5px; }
+.admin-shops-list, .admin-products-list, .admin-users-list { display: flex; flex-direction: column; }
+
+/* ── PAYMENT ─────────────────────────────────────────────── */
+.pay-method { display: flex; align-items: center; gap: 12px; padding: 13px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 9px; transition: border-color .18s; }
+.pay-method.selected { border-color: var(--G-bright); background: var(--G-dim); }
+.pay-icon { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.pay-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.pay-number { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.pay-check { margin-left: auto; width: 22px; height: 22px; border-radius: 50%; background: var(--G); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
+
+/* ── REPORT BUG ──────────────────────────────────────────── */
+.bug-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.bug-type-chip { padding: 10px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface2); cursor: pointer; text-align: center; transition: all .18s; }
+.bug-type-chip.selected { border-color: var(--R); background: var(--R-dim); }
+.bug-type-chip .btc-icon { font-size: 20px; margin-bottom: 4px; }
+.bug-type-chip .btc-label { font-size: 11px; font-weight: 700; color: var(--text); }
+
+/* ── TUTORIAL ────────────────────────────────────────────── */
+#s-tutorial { background: var(--bg); }
+.tutorial-inner { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; }
+.tutorial-slide { text-align: center; animation: fadeUp .4s ease both; }
+.tutorial-icon { font-size: 72px; margin-bottom: 24px; }
+.tutorial-title { font-family: var(--font-display); font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+.tutorial-desc { font-size: 15px; color: var(--muted2); line-height: 1.6; max-width: 280px; margin: 0 auto; }
+.tutorial-dots { display: flex; justify-content: center; gap: 7px; padding: 20px 0; }
+.tutorial-dot { width: 7px; height: 7px; border-radius: 4px; background: var(--border3); transition: background .2s, width .2s; }
+.tutorial-dot.on { background: var(--G-bright); width: 20px; }
+.tutorial-btns { padding: 16px 20px 32px; display: flex; flex-direction: column; gap: 10px; }
+.tutorial-skip { background: none; border: none; font-size: 13px; color: var(--muted); cursor: pointer; padding: 8px; text-align: center; font-family: var(--font); }
+
+/* ── PROFILE UPLOAD ──────────────────────────────────────── */
+.avatar-upload-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .2s; }
+.prof-av-wrap:hover .avatar-upload-overlay { opacity: 1; }
+.upload-spinner { display: none; position: absolute; inset: 0; background: rgba(0,0,0,.6); border-radius: 50%; align-items: center; justify-content: center; }
+.upload-spinner.show { display: flex; }
+
+/* ── ABOUT / SECURITY ────────────────────────────────────── */
+.about-hero { padding: 28px 18px 22px; text-align: center; border-bottom: 1px solid var(--border); }
+.about-logo { width: 70px; height: 70px; border-radius: 20px; overflow: hidden; margin: 0 auto 14px; }
+.about-name { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--text); }
+.about-version { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.about-description { font-size: 14px; color: var(--text2); line-height: 1.6; margin-top: 10px; }
+.contact-row { display: flex; align-items: center; gap: 13px; padding: 13px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.contact-row .ci { font-size: 18px; width: 22px; }
+.contact-row .ct { font-size: 13px; color: var(--muted2); }
+
+/* ── EMPTY STATE ─────────────────────────────────────────── */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; }
+.empty-icon { font-size: 48px; margin-bottom: 14px; }
+.empty-title { font-family: var(--font-display); font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.empty-desc { font-size: 13px; color: var(--muted2); line-height: 1.5; margin-bottom: 18px; }
+.empty-action { }
+
+/* ── STAGGER ANIMATIONS ──────────────────────────────────── */
+.stagger > * { animation: fadeUp .4s both; }
+.stagger > *:nth-child(1) { animation-delay: .04s; }
+.stagger > *:nth-child(2) { animation-delay: .08s; }
+.stagger > *:nth-child(3) { animation-delay: .12s; }
+.stagger > *:nth-child(4) { animation-delay: .16s; }
+.stagger > *:nth-child(5) { animation-delay: .20s; }
+.stagger > *:nth-child(6) { animation-delay: .24s; }
+.stagger > *:nth-child(7) { animation-delay: .28s; }
+.stagger > *:nth-child(8) { animation-delay: .32s; }
+
+@keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-5px); } 40%,80% { transform: translateX(5px); } }
+
+/* ── MISC ────────────────────────────────────────────────── */
+#admin-badge { }
+.security-item { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); }
+.security-item .si-icon { font-size: 18px; width: 24px; }
+.security-item .si-text { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); }
+.security-item .si-status { font-size: 12px; color: var(--G-bright); font-weight: 600; }
+.pwa-install-bar { background: var(--G-dim); border: 1px solid rgba(0,180,0,.2); margin: 10px 12px; border-radius: var(--radius-sm); padding: 11px 13px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.pwa-install-bar:active { background: var(--G-rich); }
+.pwa-bar-text { flex: 1; font-size: 13px; font-weight: 700; color: var(--G-bright); }
+.pwa-bar-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+
+
+/* ══════════════════════════════════════════════════════════
+   KUMSIKA V7 ADDITIONS — MALAWI THEME + PREMIUM PAY
+══════════════════════════════════════════════════════════ */
+
+/* ── AMOLED BODY OVERRIDE ──────────────────────────────── */
+[data-theme="amoled"] body { background: #000; }
+[data-theme="amoled"] #shell { background: #000; }
+[data-theme="amoled"] .screen { background: #000; }
+[data-theme="amoled"] .scroll { background: transparent; }
+[data-theme="amoled"] .nav::before { background: linear-gradient(90deg,transparent,rgba(51,158,53,.25),transparent); }
+
+/* ── MALAWI LIGHT THEME SPECIFICS ──────────────────────── */
+body { background: var(--bg); }
+.topbar { border-bottom: 2px solid var(--R); }
+.nav { border-top: 2px solid rgba(206,17,38,.15); }
+[data-theme="amoled"] .topbar { border-bottom: 1px solid rgba(255,255,255,.07); }
+[data-theme="amoled"] .nav { border-top: 1px solid rgba(255,255,255,.07); }
+
+/* ── NAV ACTIVE STATE: RED IN LIGHT, GREEN IN DARK ─────── */
+.nav-item.on .nl { color: var(--R); }
+.nav-item.on .ni { transform: translateY(-2px) scale(1.1); }
+.nav-item.on::before { background: var(--R); box-shadow: 0 0 10px rgba(206,17,38,.4); }
+[data-theme="amoled"] .nav-item.on .nl { color: var(--G-bright); }
+[data-theme="amoled"] .nav-item.on::before { background: var(--G-bright); box-shadow: 0 0 10px rgba(61,179,63,.5); }
+
+/* ── GREEN BUTTONS (success/secondary) ─────────────────── */
+.btn-green {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, #2a8a2c, var(--G-bright));
+  color: #fff; border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 700; font-family: var(--font); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 4px 18px rgba(51,158,53,.35);
+}
+.btn-green:active { filter: brightness(.9); transform: scale(.98); }
+
+/* ── TOPBAR BRAND RED ACCENT ────────────────────────────── */
+.topbar-brand em { color: var(--R) !important; font-style: normal; }
+[data-theme="amoled"] .topbar-brand em { color: var(--G-bright) !important; }
+
+/* ── AUTH HERO RED GRADIENT ─────────────────────────────── */
+.auth-hero { 
+  background: linear-gradient(160deg, var(--R-deep) 0%, var(--R) 40%, #E84060 80%, #F5F5F3 100%) !important;
+}
+[data-theme="amoled"] .auth-hero {
+  background: linear-gradient(160deg, #1a0000 0%, #220000 50%, #0d0d0d 100%) !important;
+}
+
+/* ── SPLASH SCREEN ──────────────────────────────────────── */
+.splash-screen {
+  background: linear-gradient(160deg, var(--R-deep) 0%, var(--R) 50%, #C01020 100%) !important;
+}
+
+/* ── PRODUCT & SHOP CARDS LIGHT THEME ───────────────────── */
+.p-card { 
+  background: #fff; 
+  border: 1px solid rgba(0,0,0,.07);
+  box-shadow: 0 2px 12px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.05);
+}
+.p-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.10); }
+[data-theme="amoled"] .p-card { 
+  background: #0e0e0e; 
+  border: 1px solid rgba(255,255,255,.07);
+  box-shadow: 0 2px 12px rgba(0,0,0,.5);
+}
+.shop-card {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.07);
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+}
+[data-theme="amoled"] .shop-card { background: #0e0e0e; border-color: rgba(255,255,255,.07); }
+.feat-card { background: #fff; }
+[data-theme="amoled"] .feat-card { background: #0e0e0e; }
+
+/* ── SEARCH BOX ─────────────────────────────────────────── */
+.search-box { background: #fff; border-color: rgba(0,0,0,.12); }
+[data-theme="amoled"] .search-box { background: #161616; border-color: rgba(255,255,255,.12); }
+
+/* ── SORT PILLS ─────────────────────────────────────────── */
+.sort-pill { background: #fff; border-color: rgba(0,0,0,.12); color: var(--text2); }
+.sort-pill.on { background: var(--R-dim); border-color: rgba(206,17,38,.3); color: var(--R); }
+[data-theme="amoled"] .sort-pill { background: #1a1a1a; border-color: rgba(255,255,255,.12); color: rgba(255,255,255,.7); }
+[data-theme="amoled"] .sort-pill.on { background: var(--G-dim); border-color: rgba(61,179,63,.3); color: var(--G-bright); }
+
+/* ── CAT CHIPS ──────────────────────────────────────────── */
+.cat-chip { background: #fff; border: 1.5px solid rgba(0,0,0,.12); color: var(--text2); }
+.cat-chip.on { background: var(--R-dim); border-color: rgba(206,17,38,.35); color: var(--R); }
+[data-theme="amoled"] .cat-chip { background: #1a1a1a; border-color: rgba(255,255,255,.12); }
+[data-theme="amoled"] .cat-chip.on { background: var(--G-dim); border-color: rgba(61,179,63,.3); color: var(--G-bright); }
+
+/* ── MENU ROWS ──────────────────────────────────────────── */
+.menu-card { background: #fff; border: 1px solid rgba(0,0,0,.07); box-shadow: 0 1px 6px rgba(0,0,0,.05); }
+[data-theme="amoled"] .menu-card { background: #0e0e0e; border-color: rgba(255,255,255,.07); box-shadow: none; }
+.menu-row:active { background: var(--R-dim); }
+[data-theme="amoled"] .menu-row:active { background: #1a1a1a; }
+
+/* ── INPUT FIELDS LIGHT ─────────────────────────────────── */
+.fld input, .fld select, .fld textarea, .f-input {
+  background: #fff; border-color: rgba(0,0,0,.15); color: #0A0A0A;
+}
+.fld input:focus, .fld select:focus, .fld textarea:focus, .f-input:focus {
+  border-color: rgba(206,17,38,.5); box-shadow: 0 0 0 3px rgba(206,17,38,.08);
+}
+[data-theme="amoled"] .fld input,
+[data-theme="amoled"] .fld select,
+[data-theme="amoled"] .fld textarea,
+[data-theme="amoled"] .f-input { background: #1a1a1a; border-color: rgba(255,255,255,.15); color: #fff; }
+[data-theme="amoled"] .fld input:focus,
+[data-theme="amoled"] .f-input:focus { border-color: rgba(61,179,63,.5); box-shadow: 0 0 0 3px rgba(51,158,53,.08); }
+
+/* ── MODAL SHEETS ───────────────────────────────────────── */
+.modal-sheet { background: #fff; }
+[data-theme="amoled"] .modal-sheet { background: #111; }
+.confirm-card { background: #fff; }
+[data-theme="amoled"] .confirm-card { background: #111; }
+
+/* ── TOPBAR BTN / BACK BTN ──────────────────────────────── */
+.topbar-btn { background: rgba(206,17,38,.07); border-color: rgba(206,17,38,.15); color: var(--R); }
+.back-btn { background: rgba(206,17,38,.07); border-color: rgba(206,17,38,.15); color: var(--R); }
+[data-theme="amoled"] .topbar-btn { background: #1a1a1a; border-color: rgba(255,255,255,.15); color: #fff; }
+[data-theme="amoled"] .back-btn { background: #1a1a1a; border-color: rgba(255,255,255,.15); color: #fff; }
+
+/* ── BADGE GREEN ────────────────────────────────────────── */
+.badge-g { background: rgba(51,158,53,.10); color: var(--G); border-color: rgba(51,158,53,.2); }
+.badge-r { background: var(--R-dim); color: var(--R); border-color: rgba(206,17,38,.2); }
+
+/* ── SECTION LABELS ─────────────────────────────────────── */
+.home-section-label, .p-sec-lbl { color: var(--text); font-weight: 800; }
+
+/* ── PLAN CARDS (modal) ─────────────────────────────────── */
+.plan-card {
+  border-radius: var(--radius-sm); border: 2px solid var(--border2);
+  padding: 14px 12px; cursor: pointer; transition: border-color .2s, background .2s;
+  text-align: center; background: var(--surface);
+}
+.plan-card.selected { border-color: var(--R); background: var(--R-dim); }
+.plan-period { font-size: 10px; font-weight: 800; color: var(--muted2); letter-spacing: .5px; text-transform: uppercase; }
+.plan-price { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--text); margin: 4px 0 2px; }
+.plan-card.selected .plan-price { color: var(--R); }
+.plan-note { font-size: 10px; color: var(--muted); }
+
+/* ══════════════════════════════════════════════════════════
+   PREMIUM PAY SCREEN
+══════════════════════════════════════════════════════════ */
+.prem-hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--R-deep) 0%, var(--R) 50%, #E84060 100%);
+  padding: 30px 20px 28px;
+}
+[data-theme="amoled"] .prem-hero {
+  background: linear-gradient(135deg, #1a0000 0%, #2a0008 50%, #0d0d0d 100%);
+}
+.prem-flag-stripe {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(90deg, #000 33.3%, var(--R) 33.3%, var(--R) 66.6%, var(--G) 66.6%);
+}
+.prem-hero-body { position: relative; text-align: center; }
+.prem-crown { font-size: 40px; margin-bottom: 8px; filter: drop-shadow(0 0 20px rgba(255,255,255,.3)); }
+.prem-title { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -.5px; }
+.prem-sub { font-size: 12px; color: rgba(255,255,255,.75); margin-top: 5px; }
+
+.prem-section-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 1px; color: var(--muted);
+  margin-bottom: 10px; text-transform: uppercase;
+}
+.prem-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.prem-plan-card {
+  border-radius: var(--radius); border: 2px solid var(--border2);
+  padding: 16px 12px 14px; cursor: pointer; position: relative; overflow: hidden;
+  transition: border-color .2s, background .2s; background: var(--surface);
+}
+.prem-plan-card.active { border-color: var(--R); background: var(--R-dim); }
+.pp-badge {
+  display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: .3px;
+  background: var(--surface3); color: var(--muted2); padding: 2px 7px; border-radius: 10px;
+  margin-bottom: 6px; text-transform: uppercase;
+}
+.pp-badge.save { background: rgba(245,166,35,.15); color: var(--Y); }
+.prem-plan-card.active .pp-badge:not(.save) { background: var(--R-dim); color: var(--R); }
+.pp-period { font-size: 10px; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.pp-price { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--text); }
+.prem-plan-card.active .pp-price { color: var(--R); }
+.pp-note { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.pp-check {
+  position: absolute; top: 10px; right: 10px; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--surface3); border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: transparent; transition: all .2s;
+}
+.prem-plan-card.active .pp-check { background: var(--R); border-color: var(--R); color: #fff; }
+
+.prem-benefits { 
+  display: flex; flex-direction: column; gap: 0; background: var(--surface); 
+  border-radius: var(--radius); border: 1px solid var(--border2); overflow: hidden; 
+}
+.prem-benefit { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-bottom: 1px solid var(--border); }
+.prem-benefit:last-child { border-bottom: none; }
+.pb-icon { font-size: 18px; flex-shrink: 0; }
+.pb-text { font-size: 13px; font-weight: 600; color: var(--text2); }
+
+.prem-method-tabs { display: flex; gap: 10px; }
+.pmt-tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 14px 8px; border-radius: var(--radius-sm); border: 2px solid var(--border2);
+  cursor: pointer; transition: border-color .2s, background .2s; background: var(--surface);
+}
+.pmt-tab.active { border-color: var(--R); background: var(--R-dim); }
+.pmt-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.pmt-name { font-size: 12px; font-weight: 700; color: var(--text2); }
+.pmt-tab.active .pmt-name { color: var(--R); }
+
+.prem-instructions {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--radius); overflow: hidden;
+}
+.pi-amount-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(206,17,38,.10), rgba(206,17,38,.04));
+  border-bottom: 1px solid var(--border2);
+}
+[data-theme="amoled"] .pi-amount-row { background: linear-gradient(135deg, rgba(206,17,38,.15), rgba(206,17,38,.06)); }
+.pi-amount-label { font-size: 12px; font-weight: 700; color: var(--muted2); }
+.pi-amount-value { font-family: var(--font-display); font-size: 24px; font-weight: 800; color: var(--R); }
+
+.pi-steps { padding: 4px 16px 0; display: flex; flex-direction: column; }
+.pi-step { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.pi-step:last-child { border-bottom: none; }
+.pi-step-num {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
+  background: var(--R-dim); border: 1px solid rgba(206,17,38,.3); color: var(--R);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+}
+.pi-step-text { font-size: 13px; color: var(--text2); line-height: 1.45; flex: 1; }
+
+/* ── BIG PHONE NUMBER CARD ──────────────────────────────── */
+.pi-number-card {
+  margin: 10px 16px 6px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--R-deep), var(--R));
+  border: none;
+  box-shadow: 0 8px 30px rgba(206,17,38,.35), 0 2px 8px rgba(206,17,38,.2);
+  padding: 18px 20px; cursor: pointer; text-align: center;
+  transition: transform .12s, box-shadow .2s; position: relative; overflow: hidden;
+}
+.pi-number-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+.pi-number-card:active { transform: scale(.97); box-shadow: 0 4px 15px rgba(206,17,38,.3); }
+.pi-network-badge {
+  display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .6px;
+  text-transform: uppercase; color: rgba(255,255,255,.9); background: rgba(255,255,255,.18);
+  padding: 3px 12px; border-radius: 20px; margin-bottom: 10px;
+}
+.pi-phone {
+  font-family: var(--font-display); font-size: 34px; font-weight: 800;
+  color: #fff; letter-spacing: 3px; line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.pi-copy-hint { font-size: 10px; color: rgba(255,255,255,.6); margin-top: 8px; font-weight: 600; }
+
+.pi-alt-note {
+  margin: 8px 16px 14px; padding: 10px 13px; border-radius: 10px;
+  background: rgba(245,166,35,.08); border: 1px solid rgba(245,166,35,.22);
+  font-size: 11px; color: var(--Y); font-weight: 600; line-height: 1.45;
+}
+
+.prem-form-card {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 16px;
+}
+
+.proof-upload-zone {
+  border: 2px dashed var(--border2); border-radius: var(--radius-sm);
+  padding: 28px 16px; text-align: center; cursor: pointer; background: var(--surface2);
+  transition: border-color .2s, background .2s; overflow: hidden;
+}
+.proof-upload-zone:hover { border-color: rgba(206,17,38,.4); background: var(--R-dim); }
+.proof-upload-zone.has-img { border-style: solid; border-color: var(--G); padding: 0; }
+.puz-icon { font-size: 32px; margin-bottom: 8px; }
+.puz-title { font-size: 14px; font-weight: 700; color: var(--text2); }
+.puz-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.puz-preview-img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 10px; display: block; }
+.puz-change { font-size: 10px; font-weight: 700; color: var(--G); padding: 8px 0 4px; }
+
+/* ── PREMIUM SETTINGS ROW ───────────────────────────────── */
+.prem-settings-row {
+  background: linear-gradient(135deg, rgba(206,17,38,.06), rgba(206,17,38,.02));
+  border-left: 3px solid var(--R);
+}
+[data-theme="amoled"] .prem-settings-row {
+  background: linear-gradient(135deg, rgba(206,17,38,.1), rgba(0,0,0,0));
+}
+
+</style>
+
+</head>
+<body>
+<div id="shell">
+
+<div class="offline-bar" id="offline-bar">📡 Offline — Cached content showing</div>
+<div class="toast" id="toast"></div>
+
+<!-- ████ FILTER MODAL ████ -->
+<div class="modal-backdrop" id="filter-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" data-i18n="filterSort">Filter &amp; Sort</div>
+    <div class="p-sec-lbl" style="padding:0 0 8px;" data-i18n="sortByPrice">Sort By Price</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn-sm btn-sm-g" id="sort-low-btn" style="flex:1;" onclick="setSortBtnPrice('low')" data-i18n="priceLow">↑ Low First</button>
+      <button class="btn-sm btn-sm-y" id="sort-high-btn" style="flex:1;" onclick="setSortBtnPrice('high')" data-i18n="priceHigh">↓ High First</button>
+    </div>
+    <div class="p-sec-lbl" style="padding:0 0 8px;" data-i18n="filterByDistrict">Filter By District</div>
+    <div id="district-filter-list" style="background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);overflow:hidden;max-height:220px;overflow-y:auto;"></div>
+    <div style="display:flex;gap:8px;margin-top:10px;margin-bottom:6px;">
+      <button class="btn-sm btn-sm-g" style="flex:1;" onclick="selectAllDistricts()">✓ Select All</button>
+      <button class="btn-sm btn-sm-y" style="flex:1;" onclick="clearAllDistricts()">✕ Clear All</button>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;">
+      <button class="btn-ghost" style="flex:1;" onclick="closeModal('filter-modal')" data-i18n="cancel">Cancel</button>
+      <button class="btn-g" style="flex:1;" onclick="applyFilter()">✓ <span data-i18n="apply">Apply</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ PAYMENT MODAL ████ -->
+<div class="modal-backdrop" id="pay-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--R);">🏪 Open Your Premium Shop</div>
+    <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;line-height:1.5;">
+      Get a verified shop and start selling to buyers across all 28 districts of Malawi.
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div class="plan-card selected" id="plan-month" onclick="selectPlan('month')">
+        <div class="plan-period">Monthly</div>
+        <div class="plan-price">MK 5,000</div>
+        <div class="plan-note">per month</div>
+      </div>
+      <div class="plan-card" id="plan-year" onclick="selectPlan('year')">
+        <div class="plan-period">Yearly</div>
+        <div class="plan-price">MK 40,000</div>
+        <div class="plan-note">Save MK 20,000 🎉</div>
+      </div>
+    </div>
+    <div style="background:var(--R-dim);border:1px solid rgba(206,17,38,.2);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--R);font-weight:600;line-height:1.5;">
+      📱 Pay via <strong>Airtel Money</strong> or <strong>TNM Mpamba</strong><br/>
+      Numbers: <strong>0888 258 180</strong> or <strong>0999 626 944</strong>
+    </div>
+    <button class="btn-g" onclick="closeModal('pay-modal');go('s-premium-pay',APP.screen);" style="margin-bottom:8px;">
+      💳 View Full Payment Instructions
+    </button>
+    <button class="btn-ghost" onclick="closeModal('pay-modal')">Maybe Later</button>
+  </div>
+</div>
+
+
+<!-- ████ LOGOUT CONFIRM ████ -->
+<div class="confirm-modal" id="logout-confirm">
+  <div class="confirm-card">
+    <h3 data-i18n="signOutTitle">Sign Out?</h3>
+    <p data-i18n="signOutDesc">You will be signed out. You can sign back in anytime.</p>
+    <div class="confirm-btns">
+      <button class="btn-ghost" onclick="closeModal('logout-confirm')" data-i18n="cancel">Cancel</button>
+      <button class="btn-r" onclick="doLogout()" data-i18n="signOut">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ ADMIN CONFIRM ████ -->
+<div class="confirm-modal" id="admin-confirm">
+  <div class="confirm-card">
+    <h3 id="admin-confirm-title">Confirm Action</h3>
+    <p id="admin-confirm-desc">Are you sure?</p>
+    <div class="confirm-btns">
+      <button class="btn-ghost" onclick="closeModal('admin-confirm')">Cancel</button>
+      <button class="btn-r" id="admin-confirm-btn" onclick="doAdminAction()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ PWA INSTALL ████ -->
+<div class="confirm-modal" id="pwa-modal">
+  <div class="confirm-card">
+    <h3>📲 Install Kumsika</h3>
+    <p>Add Kumsika to your home screen for the best experience — works offline too!</p>
+    <div class="confirm-btns">
+      <button class="btn-ghost" onclick="closeModal('pwa-modal')">Later</button>
+      <button class="btn-g" onclick="installPWA()">Install App</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ SPLASH ████ -->
+<div class="screen active" id="s-splash">
+  <div class="splash-bg"></div>
+  <div class="splash-flag-wrap">
+    <div class="splash-ring"></div>
+    <div class="splash-ring2"></div>
+    <div class="splash-icon">
+      <div class="mw-flag">
+        <div class="mw-black"><div class="mw-sun"></div></div>
+        <div class="mw-red"></div>
+        <div class="mw-green"></div>
+      </div>
+    </div>
+  </div>
+  <div class="splash-wordmark"><em>Kum</em>sika</div>
+  <div class="splash-sub">Malawi's #1 Marketplace · 2026 ™</div>
+  <div class="splash-powered">Powered by <span>O-Techy Company</span></div>
+  <div class="splash-loader"><div class="splash-loader-fill"></div></div>
+</div>
+
+<!-- ████ LOGIN ████ -->
+<div class="screen" id="s-login">
+  <div class="auth-hero">
+    <div class="auth-hero-glow"></div>
+    <div class="auth-hero-line"></div>
+    <div class="auth-flag-icon">
+      <div class="mw-flag">
+        <div class="mw-black"><div class="mw-sun" style="width:18px;height:18px;"></div></div>
+        <div class="mw-red"></div><div class="mw-green"></div>
+      </div>
+    </div>
+    <h1 data-i18n="welcomeBack">Welcome back 👋<br/>Buy &amp; sell in<br/><span style="color:var(--G-bright)">Malawi.</span></h1>
+    <p data-i18n="trustedBy">Trusted by thousands across Malawi</p>
+  </div>
+  <div class="auth-form">
+    <div class="lang-pill" onclick="go('s-lang','s-login')">
+      <span class="globe">🌍</span><span id="cur-lang">English</span><span class="arr">▾</span>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="emailAddress">Email Address</label>
+      <input class="f-input" type="email" id="l-email" placeholder="you@example.com" oninput="validateEmailField()" autocomplete="email"/>
+      <div class="f-err" id="e-err" data-i18n="validEmail">Enter a valid email address</div>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="password">Password</label>
+      <div class="pw-wrap">
+        <input class="f-input" type="password" id="l-pass" placeholder="••••••••" oninput="validatePassField()" autocomplete="current-password"/>
+        <span class="pw-eye" onclick="togglePw('l-pass',this)">👁️</span>
+      </div>
+      <div class="f-err" id="p-err" data-i18n="passMin">Password must be 6+ characters</div>
+    </div>
+    <button class="btn-g" id="login-btn" onclick="doLogin()"><span id="login-btn-text" data-i18n="signIn">Sign In</span></button>
+    <div class="div-line"><span data-i18n="or">or</span></div>
+    <button class="btn-ghost" onclick="goHome(true)" data-i18n="browseGuest">Browse as Guest</button>
+    <p style="text-align:center;font-size:12px;color:var(--muted);">
+      <span data-i18n="noAccount">New here?</span> <span style="color:var(--G-bright);font-weight:700;cursor:pointer;" onclick="go('s-signup','s-login')" data-i18n="createAccount">Create Account</span>
+    </p>
+  </div>
+</div>
+
+<!-- ████ SIGN UP ████ -->
+<div class="screen" id="s-signup">
+  <div class="auth-hero">
+    <div class="auth-hero-glow"></div>
+    <div class="auth-hero-line"></div>
+    <div class="auth-flag-icon">
+      <div class="mw-flag">
+        <div class="mw-black"><div class="mw-sun" style="width:18px;height:18px;"></div></div>
+        <div class="mw-red"></div><div class="mw-green"></div>
+      </div>
+    </div>
+    <h1 data-i18n="joinKumsika">Join Kumsika 🎉<br/>Start selling in<br/><span style="color:var(--G-bright)">Malawi.</span></h1>
+    <p data-i18n="freeToJoin">Free to join. Thousands of buyers waiting.</p>
+  </div>
+  <div class="auth-form">
+    <div>
+      <label class="f-label" data-i18n="fullName">Full Name</label>
+      <input class="f-input" type="text" id="su-name" placeholder="e.g. Grace Phiri" oninput="validateSignupField('su-name','su-name-err',v=>v.trim().length>=2,'Name must be at least 2 characters')"/>
+      <div class="f-err" id="su-name-err">Name must be at least 2 characters</div>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="emailAddress">Email Address</label>
+      <input class="f-input" type="email" id="su-email" placeholder="you@example.com" oninput="validateSignupField('su-email','su-email-err',v=>v.includes('@')&&v.includes('.'),'Enter a valid email')"/>
+      <div class="f-err" id="su-email-err">Enter a valid email</div>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="phoneNumber">Phone Number</label>
+      <input class="f-input" type="tel" id="su-phone" placeholder="+265 9XX XXX XXX" oninput="validateSignupField('su-phone','su-phone-err',v=>v.trim().length>=9,'Enter a valid phone number')"/>
+      <div class="f-err" id="su-phone-err">Enter a valid phone number</div>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="password">Password</label>
+      <div class="pw-wrap">
+        <input class="f-input" type="password" id="su-pass" placeholder="Min. 6 characters" oninput="checkPasswordStrength(this.value)" autocomplete="new-password"/>
+        <span class="pw-eye" onclick="togglePw('su-pass',this)">👁️</span>
+      </div>
+      <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+      <div class="strength-label" id="strength-label"></div>
+      <div class="f-err" id="su-pass-err">Password must be 6+ characters</div>
+    </div>
+    <div class="fld">
+      <label data-i18n="district">District</label>
+      <select id="su-district">
+        <option value="">Choose district…</option>
+        <option>Lilongwe</option><option>Blantyre</option><option>Mzuzu</option>
+        <option>Zomba</option><option>Kasungu</option><option>Mangochi</option>
+        <option>Salima</option><option>Dedza</option><option>Karonga</option>
+        <option>Ntchisi</option><option>Dowa</option><option>Nkhotakota</option>
+        <option>Balaka</option><option>Chiradzulu</option><option>Chikwawa</option>
+        <option>Nsanje</option><option>Thyolo</option><option>Mulanje</option>
+        <option>Phalombe</option><option>Machinga</option><option>Mwanza</option>
+        <option>Neno</option><option>Lilongwe Rural</option><option>Other</option>
+      </select>
+    </div>
+    <div class="toggle-row">
+      <div class="tl">
+        <div class="tn" data-i18n="iAmSeller">I am a Seller</div>
+        <div class="ts" data-i18n="sellerDesc">I want to open a shop and sell products</div>
+      </div>
+      <div class="toggle" id="su-seller-toggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <button class="btn-g" id="signup-btn" onclick="doSignup()"><span data-i18n="createAccount">Create Account</span></button>
+    <p style="text-align:center;font-size:11px;color:var(--muted);line-height:1.5;" data-i18n="agreeTerms">By signing up you agree to Kumsika's guidelines &amp; privacy policy</p>
+    <p style="text-align:center;font-size:12px;color:var(--muted);">
+      <span data-i18n="haveAccount">Already have an account?</span> <span style="color:var(--G-bright);font-weight:700;cursor:pointer;" onclick="go('s-login','s-signup')" data-i18n="signIn">Sign In</span>
+    </p>
+  </div>
+</div>
+
+<!-- ████ HOME ████ -->
+<div class="screen" id="s-home">
+  <div class="topbar">
+    <div class="topbar-flag">
+      <div class="mw-flag">
+        <div class="mw-black"><div class="mw-sun" style="width:13px;height:13px;"></div></div>
+        <div class="mw-red"></div><div class="mw-green"></div>
+      </div>
+    </div>
+    <div class="topbar-brand"><em>Kum</em>sika</div>
+    <div class="topbar-btn" onclick="go('s-notifications','s-home')">🔔<div class="dot-badge" id="notif-badge"></div></div>
+    <div class="topbar-btn" onclick="go('s-messages','s-home')">💬<div class="dot-badge" id="msg-badge"></div></div>
+    <div class="topbar-btn" onclick="go('s-shelves','s-home')">🔖</div>
+  </div>
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="ico">🔍</span>
+      <input type="text" id="search-inp" data-i18n-placeholder="searchPlaceholder" placeholder="Search products in Malawi…" oninput="doSearch(this.value)" onfocus="showSearchHistory()"/>
+      <button class="search-filter-btn" onclick="openModal('filter-modal')">⚡ <span data-i18n="filter">Filter</span></button>
+    </div>
+  </div>
+  <div id="search-history-panel" style="display:none;padding:6px 14px 4px;flex-shrink:0;">
+    <div class="sh-header"><span data-i18n="recentSearches">Recent Searches</span><a onclick="clearSearchHistory()" data-i18n="clear">Clear</a></div>
+    <div class="sh-chips" id="search-history-chips"></div>
+  </div>
+  <div class="sort-bar">
+    <span class="sort-label">Sort:</span>
+    <button class="sort-pill on" id="sp-default" onclick="sortProducts('default',this)" data-i18n="sortDefault">Default</button>
+    <button class="sort-pill" id="sp-low" onclick="sortProducts('low',this)" data-i18n="sortLow">Price: Low↑</button>
+    <button class="sort-pill" id="sp-high" onclick="sortProducts('high',this)" data-i18n="sortHigh">Price: High↓</button>
+    <button class="sort-pill" id="sp-dist" onclick="sortProducts('district',this)" data-i18n="sortDist">By District</button>
+  </div>
+  <div class="cats stagger">
+    <button class="cat-chip on" onclick="catClick(this,'All')" data-i18n="all">All</button>
+    <button class="cat-chip" onclick="catClick(this,'Electronics')">📱 Electronics</button>
+    <button class="cat-chip" onclick="catClick(this,'Fashion')">👗 Fashion</button>
+    <button class="cat-chip" onclick="catClick(this,'Food')">🌽 Food</button>
+    <button class="cat-chip" onclick="catClick(this,'Vehicles')">🚗 Vehicles</button>
+    <button class="cat-chip" onclick="catClick(this,'Furniture')">🛋️ Furniture</button>
+    <button class="cat-chip" onclick="catClick(this,'Jobs')">💼 Jobs</button>
+    <button class="cat-chip" onclick="catClick(this,'Services')">🔧 Services</button>
+  </div>
+  <div class="scroll" id="home-scroll">
+    <div class="stats-ribbon stagger">
+      <div class="stat-cell"><div class="stat-num">12K+</div><div class="stat-lbl" data-i18n="statSellers">Sellers</div></div>
+      <div class="stat-cell"><div class="stat-num">48K+</div><div class="stat-lbl" data-i18n="statListings">Listings</div></div>
+      <div class="stat-cell"><div class="stat-num">98%</div><div class="stat-lbl" data-i18n="statSatisfied">Satisfied</div></div>
+    </div>
+    <div id="pwa-install-hint" style="display:none;">
+      <div class="pwa-install-bar" onclick="openModal('pwa-modal')">
+        <span>📲</span>
+        <div><div class="pwa-bar-text">Install Kumsika App</div><div class="pwa-bar-sub">Add to home screen for offline access</div></div>
+        <span style="color:var(--G-bright);">›</span>
+      </div>
+    </div>
+    <div class="sec"><h2>🔥 <span data-i18n="hotDeals">Hot Deals</span></h2><a onclick="catClick(document.querySelector('.cat-chip'),'All')" data-i18n="seeAll">See all</a></div>
+    <div class="h-scroll" id="h-scroll-container"></div>
+    <div class="hero-banner" onclick="go('s-shops','s-home')">
+      <div class="banner-icon">🏪</div>
+      <div class="banner-text">
+        <h3 data-i18n="browseShops">Browse Shops</h3>
+        <p data-i18n="browseShopsDesc">Discover verified sellers across Malawi</p>
+      </div>
+      <button class="banner-btn" onclick="event.stopPropagation();go('s-shops','s-home')" data-i18n="explore">Explore</button>
+    </div>
+    <div class="sec"><h2 data-i18n="latestListings">Latest Listings</h2><a onclick="toast('Loading…')">›</a></div>
+    <div class="p-grid" id="products-grid"></div>
+    <div style="height:8px;"></div>
+  </div>
+  <div class="nav">
+    <button class="nav-item on" id="ni-home" onclick="navTo('s-home','ni-home')"><span class="ni">🏠</span><span class="nl" id="nl-home" data-i18n="home">Home</span></button>
+    <button class="nav-item" id="ni-shops" onclick="navTo('s-shops','ni-shops')"><span class="ni">🏪</span><span class="nl" id="nl-shops" data-i18n="shops">Shops</span></button>
+    <div class="nav-fab-wrap"><button class="nav-fab" onclick="checkSellerAndSell()">＋</button></div>
+    <button class="nav-item" id="ni-messages" onclick="navTo('s-messages','ni-messages')"><span class="ni">💬</span><span class="nl" id="nl-messages" data-i18n="messages">Messages</span></button>
+    <button class="nav-item" id="ni-profile" onclick="navTo('s-profile','ni-profile')"><span class="ni">👤</span><span class="nl" id="nl-profile" data-i18n="profile">Profile</span></button>
+  </div>
+</div>
+
+<!-- ████ PRODUCT DETAIL ████ -->
+<div class="screen" id="s-detail">
+  <div class="det-gallery" id="det-gallery-img">
+    <button class="det-back" onclick="back()">←</button>
+    <button class="det-share" onclick="shareProduct()">↗</button>
+    <div class="det-img-counter" id="det-img-counter">1 / 3</div>
+    <div class="det-dots"><div class="det-dot on"></div><div class="det-dot"></div><div class="det-dot"></div></div>
+    <div id="det-emoji" style="font-size:90px;">📱</div>
+  </div>
+  <div class="det-body">
+    <div class="det-cat-tag" id="det-cat">⚡ Electronics</div>
+    <div class="det-title" id="det-title">iPhone 14 Pro Max</div>
+    <div class="det-price" id="det-price">MK 750,000</div>
+    <div class="det-meta">
+      <span id="det-meta-txt">Negotiable · Lilongwe</span>
+      <div class="det-views">👁️ <span id="det-views-count">247</span></div>
+    </div>
+    <div class="det-wa-btn" id="det-wa-btn">
+      <span>💬</span><span data-i18n="chatWhatsApp">Chat on WhatsApp</span>
+    </div>
+    <div class="det-seller" id="det-seller-row" onclick="openShopFromDetail()">
+      <div class="seller-av"><span id="det-seller-av">🧑🏾</span></div>
+      <div class="seller-info">
+        <div class="sname" id="det-seller-name">TechHub Lilongwe</div>
+        <div class="smeta" id="det-seller-meta">Verified · 124 listings</div>
+      </div>
+      <div class="seller-stars">⭐ <span id="det-seller-rating">4.9</span><span id="det-seller-reviews">187 reviews</span></div>
+    </div>
+    <p class="det-desc" id="det-desc">Product description here.</p>
+    <div class="det-tags" id="det-tags">
+      <div class="d-tag">Good Condition</div>
+      <div class="d-tag">Negotiable</div>
+    </div>
+  </div>
+  <div class="det-cta">
+    <button class="det-save" id="det-save-btn" onclick="toggleSave(this)">🤍</button>
+    <button class="btn-g" style="flex:1;" onclick="openChatFromDetail()" data-i18n="chatSeller">💬 Chat with Seller</button>
+  </div>
+</div>
+
+<!-- ████ SHOPS ████ -->
+<div class="screen" id="s-shops">
+  <div class="topbar">
+    <div class="topbar-flag"><div class="mw-flag"><div class="mw-black"><div class="mw-sun" style="width:13px;height:13px;"></div></div><div class="mw-red"></div><div class="mw-green"></div></div></div>
+    <div class="topbar-brand" data-i18n="shopsTitle">Shops</div>
+    <div class="topbar-btn" onclick="go('s-shop-create','s-shops')">＋</div>
+  </div>
+  <div class="shop-search"><input type="text" data-i18n-placeholder="searchShops" placeholder="Search shops…" oninput="searchShops(this.value)"/></div>
+  <div class="scroll" id="shops-scroll">
+    <div id="shops-list" style="padding:12px;"></div>
+  </div>
+  <div class="nav">
+    <button class="nav-item" id="ni-home2" onclick="navTo('s-home','ni-home')"><span class="ni">🏠</span><span class="nl" data-i18n="home">Home</span></button>
+    <button class="nav-item on" id="ni-shops2" onclick="navTo('s-shops','ni-shops')"><span class="ni">🏪</span><span class="nl" data-i18n="shops">Shops</span></button>
+    <div class="nav-fab-wrap"><button class="nav-fab" onclick="checkSellerAndSell()">＋</button></div>
+    <button class="nav-item" id="ni-msgs2" onclick="navTo('s-messages','ni-messages')"><span class="ni">💬</span><span class="nl" data-i18n="messages">Messages</span></button>
+    <button class="nav-item" id="ni-prof2" onclick="navTo('s-profile','ni-profile')"><span class="ni">👤</span><span class="nl" data-i18n="profile">Profile</span></button>
+  </div>
+</div>
+
+<!-- ████ SHOP DETAIL ████ -->
+<div class="screen" id="s-shop-detail">
+  <div style="height:180px;background:var(--surface2);position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:60px;" id="shop-cover-wrap">
+    <div id="shop-cover-emoji">🏪</div>
+    <button class="det-back" onclick="back()" style="position:absolute;top:14px;left:14px;">←</button>
+    <button class="det-share" onclick="toast('🔗 Shop link copied!','g')" style="position:absolute;top:14px;right:14px;">↗</button>
+  </div>
+  <div class="scroll-free">
+    <div style="padding:14px 14px 10px;display:flex;align-items:center;gap:12px;">
+      <div style="width:50px;height:50px;border-radius:14px;background:var(--G-dim);border:1px solid rgba(0,200,0,.2);display:flex;align-items:center;justify-content:center;font-size:26px;" id="shop-logo-lg">🏪</div>
+      <div style="flex:1;">
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--text);" id="shop-name-lg">TechHub</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="shop-detail-meta">24 listings · Lilongwe</div>
+      </div>
+      <div id="shop-sub-badge" class="badge badge-g">ACTIVE</div>
+    </div>
+    <div class="shop-subs-warning" id="shop-subs-warning">⚠️ This shop's subscription is not active. Listings may be hidden.</div>
+    <div style="display:flex;gap:14px;padding:0 14px 10px;">
+      <div style="font-size:12px;color:var(--muted2);">👁️ <span id="shop-viewer-count">0</span> views</div>
+      <div style="font-size:12px;color:var(--muted2);">⭐ <span id="shop-rating">4.9</span></div>
+    </div>
+    <div class="shop-contact-btns" id="shop-contact-btns">
+      <button class="btn-g" style="flex:1;" onclick="go('s-chat','s-shop-detail')">💬 <span data-i18n="chat">Chat</span></button>
+      <button class="btn-wa" style="flex:1;" onclick="openWhatsApp(currentShop?.name,'shop','',currentShop?.wa)">WhatsApp</button>
+    </div>
+    <div class="p-sec-lbl" data-i18n="products">Products</div>
+    <div class="p-grid shop-detail-products" id="shop-products-grid" style="padding-bottom:20px;"></div>
+  </div>
+</div>
+
+<!-- ████ SHOP CREATE ████ -->
+<div class="screen" id="s-shop-create">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="openShop">Open Your Shop</h2>
+  </div>
+  <div class="scroll-free">
+    <div class="shop-form-wrap">
+      <div class="plan-card">
+        <div class="plan-name">🏪 Seller Plan</div>
+        <div class="plan-price">MK 5,000 <span>/month</span></div>
+        <div class="plan-feature">✅ Unlimited product listings</div>
+        <div class="plan-feature">✅ Verified seller badge</div>
+        <div class="plan-feature">✅ Analytics &amp; insights</div>
+        <div class="plan-feature">✅ Priority in search results</div>
+      </div>
+      <div class="fld"><label data-i18n="shopName">Shop Name</label><input type="text" id="shop-name-inp" placeholder="e.g. TechHub Lilongwe"/></div>
+      <div class="fld">
+        <label data-i18n="category">Category</label>
+        <select id="shop-cat-inp">
+          <option value="">Choose category…</option>
+          <option>Electronics</option><option>Fashion</option><option>Food</option>
+          <option>Vehicles</option><option>Furniture</option><option>Services</option>
+          <option>Agriculture</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label data-i18n="district">Your District</label>
+        <select id="shop-district-inp">
+          <option value="">Choose district…</option>
+          <option>Lilongwe</option><option>Blantyre</option><option>Mzuzu</option>
+          <option>Zomba</option><option>Kasungu</option><option>Mangochi</option>
+          <option>Salima</option><option>Dedza</option><option>Karonga</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fld"><label>WhatsApp Number</label><input type="tel" id="shop-wa-inp" placeholder="+265 9XX XXX XXX"/></div>
+      <div class="fld"><label>Shop Description</label><textarea id="shop-desc-inp" placeholder="Describe your shop, what you sell, your specialties…" rows="3"></textarea></div>
+      <button class="btn-g" onclick="createShop()">🏪 Continue to Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ MY SHOP ████ -->
+<div class="screen" id="s-my-shop">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="myShop">My Shop</h2>
+    <div class="topbar-btn" onclick="go('s-sell','s-my-shop')">＋</div>
+  </div>
+  <div class="scroll-free">
+    <div class="my-shop-header">
+      <div id="my-shop-sub-banner" class="sub-banner active">
+        <div class="sub-banner-inner">
+          <div class="sub-icon">✅</div>
+          <div class="sub-text"><div class="st1" data-i18n="subActive">Subscription Active</div><div class="st2" id="sub-expiry">Expires 2026-03-21</div></div>
+          <span class="sub-action green" onclick="openModal('pay-modal')">Renew ›</span>
+        </div>
+      </div>
+    </div>
+    <div class="my-shop-stats">
+      <div class="mss-cell"><div class="mss-num" id="my-shop-products">0</div><div class="mss-lbl" data-i18n="products">Products</div></div>
+      <div class="mss-cell"><div class="mss-num" id="my-shop-views">0</div><div class="mss-lbl" data-i18n="views">Views</div></div>
+      <div class="mss-cell"><div class="mss-num" id="my-shop-sales">89</div><div class="mss-lbl" data-i18n="sales">Sales</div></div>
+    </div>
+    <div class="p-sec-lbl" data-i18n="myListings">My Listings</div>
+    <div id="my-shop-products-list"></div>
+    <div style="height:20px;"></div>
+  </div>
+</div>
+
+<!-- ████ SELL ████ -->
+<div class="screen" id="s-sell">
+  <div class="sell-top">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="postListing">Post a Listing</h2>
+  </div>
+  <div class="scroll-free">
+    <div class="sell-sub-gate" id="sell-sub-gate">
+      <p data-i18n="subRequired">⚠️ Active subscription required to post listings.</p>
+      <button class="btn-y" onclick="openModal('pay-modal')" data-i18n="activateShop">💳 Activate Shop</button>
+    </div>
+    <div id="sell-form-wrap" class="sell-body">
+      <div>
+        <div class="f-label" data-i18n="photos">Photos</div>
+        <div class="photos-grid" id="photos-grid">
+          <div class="photo-slot" id="add-photo-btn" onclick="addPhoto()">
+            <span>📷</span><span data-i18n="addPhoto">Add Photo</span>
+          </div>
+        </div>
+        <div class="photo-counter">📷 <span class="pc-num" id="photo-count">0</span>/3 <span data-i18n="photos">photos</span></div>
+      </div>
+      <div class="ai-cta" onclick="aiWrite()">
+        <div class="ai-cta-icon">🤖</div>
+        <div class="ai-cta-text"><div class="at1" data-i18n="aiWrite">AI — Write for me</div><div class="at2" data-i18n="aiWriteDesc">Auto-fill listing with AI</div></div>
+        <div class="arr2">›</div>
+      </div>
+      <div class="fld"><label data-i18n="productTitle">Product Title</label><input type="text" id="s-title" placeholder="e.g. iPhone 14 Pro Max 256GB"/></div>
+      <div class="fld"><label data-i18n="description">Description</label><textarea id="s-desc" rows="3" placeholder="Describe your product in detail…"></textarea></div>
+      <div class="price-row">
+        <div class="fld"><label data-i18n="price">Price (MK)</label><input type="number" id="s-price" placeholder="0"/></div>
+        <div class="fld"><label data-i18n="category">Category</label>
+          <select id="s-category">
+            <option value="">Category…</option>
+            <option>Electronics</option><option>Fashion</option><option>Food</option>
+            <option>Vehicles</option><option>Furniture</option><option>Jobs</option>
+            <option>Services</option><option>Agriculture</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="fld">
+        <label data-i18n="location">Location</label>
+        <select id="s-location">
+          <option value="">Your district…</option>
+          <option>Lilongwe</option><option>Blantyre</option><option>Mzuzu</option>
+          <option>Zomba</option><option>Kasungu</option><option>Mangochi</option>
+          <option>Salima</option><option>Dedza</option><option>Karonga</option><option>Other</option>
+        </select>
+      </div>
+      <div class="toggle-row">
+        <div class="tl"><div class="tn" data-i18n="negotiable">Negotiable</div><div class="ts" data-i18n="negotiableDesc">Allow buyers to make offers</div></div>
+        <div class="toggle" id="tog-negotiate"></div>
+      </div>
+      <div class="toggle-row">
+        <div class="tl"><div class="tn" data-i18n="delivery">Delivery Available</div><div class="ts" data-i18n="deliveryDesc">You can deliver to buyer</div></div>
+        <div class="toggle on" id="tog-delivery"></div>
+      </div>
+      <button class="btn-g" id="post-btn" onclick="doPost()">🚀 <span data-i18n="postFree">Post Listing — Free</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ MESSAGES ████ -->
+<div class="screen" id="s-messages">
+  <div class="msgs-top">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="messages">Messages</h2>
+    <div class="topbar-btn" onclick="toast('✏️ New message','g')">✏️</div>
+  </div>
+  <div class="scroll-free" id="messages-list">
+    <div id="conv-list"></div>
+    <div id="messages-empty" style="display:none;">
+      <div class="empty-state"><div class="empty-icon">💬</div><div class="empty-title" data-i18n="noMessages">No Messages Yet</div><div class="empty-desc" data-i18n="noMessagesDesc">Chat with sellers to negotiate and buy.</div><div class="empty-action"><button class="btn-ghost" style="width:auto;padding:10px 24px;" onclick="go('s-home','s-messages')" data-i18n="browseListing">Browse Listings</button></div></div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nav-item" onclick="navTo('s-home','ni-home')"><span class="ni">🏠</span><span class="nl" data-i18n="home">Home</span></button>
+    <button class="nav-item" onclick="navTo('s-shops','ni-shops')"><span class="ni">🏪</span><span class="nl" data-i18n="shops">Shops</span></button>
+    <div class="nav-fab-wrap"><button class="nav-fab" onclick="checkSellerAndSell()">＋</button></div>
+    <button class="nav-item on"><span class="ni">💬</span><span class="nl" data-i18n="messages">Messages</span></button>
+    <button class="nav-item" onclick="navTo('s-profile','ni-profile')"><span class="ni">👤</span><span class="nl" data-i18n="profile">Profile</span></button>
+  </div>
+</div>
+
+<!-- ████ CHAT ████ -->
+<div class="screen" id="s-chat">
+  <div class="chat-top">
+    <button class="back-btn" onclick="back()">←</button>
+    <div style="flex:1;">
+      <div class="chat-top" style="padding:0;border:none;background:none;">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--G-dim);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;margin-left:8px;" id="chat-av">🧑🏾</div>
+        <div style="flex:1;margin-left:8px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);" id="chat-name">TechHub</div>
+          <div class="cmeta" id="chat-online">🟢 Online</div>
+        </div>
+      </div>
+    </div>
+    <div class="c-call" onclick="toast('📞 Calling…','g')">📞</div>
+  </div>
+  <div class="ai-suggestion">
+    <div class="ai-suggest-chip" onclick="quickReply('Is this still available?')" data-i18n="stillAvail">Still available?</div>
+    <div class="ai-suggest-chip" onclick="quickReply('Can you do a lower price?')" data-i18n="lowerPrice">Lower price?</div>
+    <div class="ai-suggest-chip" onclick="quickReply('Where are you located?')" data-i18n="location">Location?</div>
+    <div class="ai-suggest-chip" onclick="quickReply('I will pay cash today!')" data-i18n="payCash">Pay cash!</div>
+    <div class="ai-suggest-chip" onclick="quickReply('Can you deliver?')" data-i18n="canDeliver">Delivery?</div>
+  </div>
+  <div class="chat-box" id="chat-box">
+    <div class="msg them">
+      <div class="bubble">Hi! Welcome to TechHub Lilongwe 👋 How can I help you today?</div>
+      <div class="m-time">10:24 AM</div>
+    </div>
+    <div class="msg me">
+      <div class="bubble">I'm interested in the iPhone 14 Pro Max. Is it still available?</div>
+      <div class="m-time">10:25 AM ✓✓</div>
+    </div>
+    <div class="msg them">
+      <div class="bubble">Yes it is! Price is MK 750,000. Battery health 91%. Come see it in Lilongwe Area 2. 📱</div>
+      <div class="m-time">10:26 AM</div>
+    </div>
+    <div class="m-product" onclick="go('s-detail','s-chat')">
+      <div class="m-product-img">📱</div>
+      <div><div style="font-size:12px;font-weight:700;color:var(--text);">iPhone 14 Pro Max</div><div style="font-size:13px;font-weight:800;color:var(--G-bright);font-family:var(--font-display);">MK 750,000</div><div style="font-size:10px;color:var(--muted);">Tap to view</div></div>
+    </div>
+    <div class="typing-dots" id="typing-msg"><span></span><span></span><span></span></div>
+  </div>
+  <div class="chat-inp">
+    <div class="c-attach" onclick="toast('📎 Attach file')">📎</div>
+    <textarea class="c-text" id="c-input" rows="1" data-i18n-placeholder="msgPlaceholder" placeholder="Type a message…"></textarea>
+    <button class="c-send" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<!-- ████ SHELVES ████ -->
+<div class="screen" id="s-shelves">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="shelves">My Shelves</h2>
+    <div class="topbar-btn" onclick="createNewShelf()">＋</div>
+  </div>
+  <div class="shelf-scroll" id="shelves-list"></div>
+</div>
+
+<!-- ████ NOTIFICATIONS ████ -->
+<div class="screen" id="s-notifications">
+  <div class="msgs-top">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="notifications">Notifications</h2>
+    <div class="topbar-btn" onclick="clearNotifs()">✓</div>
+  </div>
+  <div class="scroll-free" id="notif-container"></div>
+</div>
+
+<!-- ████ PROFILE ████ -->
+<div class="screen" id="s-profile">
+  <div class="prof-header">
+    <div class="prof-av-wrap" onclick="triggerAvatarUpload()">
+      <div class="prof-av" id="profile-av-container"><span id="profile-av">🧑🏾</span></div>
+      <div class="prof-av-edit">✏️</div>
+      <div class="upload-spinner" id="avatar-upload-spinner"><div class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div></div>
+    </div>
+    <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this)"/>
+    <div class="prof-name" id="profile-name">Peter Mlandula</div>
+    <div class="prof-email" id="profile-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3b4b5e4f5e497b544f5e58534215564c">[email&#160;protected]</a> · Lilongwe</div>
+    <div class="prof-badges">
+      <span class="badge badge-g" id="verified-badge">✅ Verified</span>
+      <span class="badge badge-grey" id="seller-badge">🏪 Seller</span>
+      <span class="badge" style="background:rgba(150,0,200,.12);color:#cc88ff;border:1px solid rgba(150,0,200,.2);" id="admin-badge" style="display:none;">⚡ Admin</span>
+    </div>
+    <div class="prof-stats">
+      <div class="pstat"><div class="pstat-n" id="stat-listings">0</div><div class="pstat-l" data-i18n="listings">Listings</div></div>
+      <div class="pstat"><div class="pstat-n">89</div><div class="pstat-l" data-i18n="sales">Sales</div></div>
+      <div class="pstat"><div class="pstat-n" id="stat-views">0</div><div class="pstat-l" data-i18n="views">Views</div></div>
+    </div>
+  </div>
+  <div class="prof-scroll">
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="selling">Selling</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="go('s-my-shop','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(0,180,0,.1);">🏪</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="myShop">My Shop</div><div class="menu-row-sub" id="profile-shop-status">Active — expires Mar 2026</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-my-listings','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(0,120,200,.1);">📦</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="myListings">My Listings</div><div class="menu-row-sub" id="profile-listings-count">0 active listings</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="account">Account</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="go('s-edit-account','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(100,100,200,.1);">👤</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="editProfile">Edit Profile</div></div>
+          <div class="menu-row-right rv green" data-i18n="edit">Edit ›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-security','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(200,100,0,.1);">🔐</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="security">Security</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-lang','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(0,180,180,.1);">🌍</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="language">Language</div></div>
+          <div class="menu-row-right rv green" id="settings-lang-display">English ›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-settings','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(150,150,0,.1);">⚙️</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="settings">Settings</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="support">Support</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="go('s-tutorial','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(0,180,0,.08);">📖</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="howToUse">How to Use</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-report-bug','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(230,0,0,.08);">🐛</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="reportBug">Report a Bug</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-about','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(150,0,200,.08);">ℹ️</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="aboutApp">About Kumsika</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" id="admin-menu-row" onclick="go('s-admin','s-profile')" style="display:none;">
+          <div class="menu-row-icon" style="background:rgba(150,0,200,.12);">⚡</div>
+          <div class="menu-row-body"><div class="menu-row-title" style="color:#cc88ff;">Admin Dashboard</div></div>
+          <div class="menu-row-right" style="color:#cc88ff;">›</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px;">
+      <button class="btn-r" onclick="openModal('logout-confirm')" data-i18n="signOut">🚪 Sign Out</button>
+    </div>
+    <div style="text-align:center;padding:10px 0 28px;font-size:11px;color:var(--muted);">Kumsika v5.0 · Powered by O-Techy Company</div>
+  </div>
+  <div class="nav">
+    <button class="nav-item" onclick="navTo('s-home','ni-home')"><span class="ni">🏠</span><span class="nl" data-i18n="home">Home</span></button>
+    <button class="nav-item" onclick="navTo('s-shops','ni-shops')"><span class="ni">🏪</span><span class="nl" data-i18n="shops">Shops</span></button>
+    <div class="nav-fab-wrap"><button class="nav-fab" onclick="checkSellerAndSell()">＋</button></div>
+    <button class="nav-item" onclick="navTo('s-messages','ni-messages')"><span class="ni">💬</span><span class="nl" data-i18n="messages">Messages</span></button>
+    <button class="nav-item on" id="ni-profile2"><span class="ni">👤</span><span class="nl" data-i18n="profile">Profile</span></button>
+  </div>
+</div>
+
+<!-- ████ EDIT ACCOUNT ████ -->
+<div class="screen" id="s-edit-account">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="editProfile">Edit Profile</h2>
+    <button class="btn-sm btn-sm-g" onclick="saveProfile()" style="padding:8px 14px;" data-i18n="save">Save</button>
+  </div>
+  <div class="scroll-free">
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px;padding-bottom:40px;">
+      <div style="text-align:center;padding:10px 0 6px;">
+        <div style="position:relative;display:inline-block;" onclick="triggerAvatarUpload()">
+          <div class="prof-av" style="width:80px;height:80px;font-size:36px;margin:0 auto;" id="edit-av-preview"><span id="edit-av-emoji">🧑🏾</span></div>
+          <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;background:var(--G);display:flex;align-items:center;justify-content:center;font-size:12px;border:2px solid var(--surface);">📷</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;" data-i18n="tapToChange">Tap to change photo</div>
+      </div>
+      <div class="fld"><label data-i18n="fullName">Full Name</label><input type="text" id="edit-name" placeholder="Your name"/></div>
+      <div class="fld"><label data-i18n="emailAddress">Email Address</label><input type="email" id="edit-email" placeholder="you@email.com"/></div>
+      <div class="fld"><label data-i18n="phoneNumber">Phone Number</label><input type="tel" id="edit-phone" placeholder="+265 9XX XXX XXX"/></div>
+      <div class="fld">
+        <label data-i18n="district">District</label>
+        <select id="edit-district">
+          <option>Lilongwe</option><option>Blantyre</option><option>Mzuzu</option>
+          <option>Zomba</option><option>Kasungu</option><option>Mangochi</option>
+          <option>Salima</option><option>Dedza</option><option>Karonga</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fld"><label data-i18n="bio">Bio</label><textarea id="edit-bio" rows="3" placeholder="Tell buyers about yourself…"></textarea></div>
+      <button class="btn-g" onclick="saveProfile()" data-i18n="saveChanges">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ SETTINGS ████ -->
+<div class="screen" id="s-settings">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="settings">Settings</h2>
+  </div>
+  <div class="scroll-free">
+    <div class="menu-section">
+      <div class="menu-label" style="color:var(--R);font-weight:800;">⭐ Premium</div>
+      <div class="menu-card">
+        <div class="menu-row prem-settings-row" onclick="go('s-premium-pay','s-settings')">
+          <div class="menu-row-icon" style="background:var(--R-dim);border:1px solid rgba(206,17,38,.2);font-size:20px;">⭐</div>
+          <div class="menu-row-body">
+            <div class="menu-row-title" style="color:var(--R);font-weight:800;">Pay for Premium Shop</div>
+            <div class="menu-row-sub">MK 5,000/month · Airtel Money or TNM Mpamba</div>
+          </div>
+          <div style="background:var(--R);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;flex-shrink:0;">UPGRADE</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="appearance">Appearance</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="setTheme('amoled')">
+          <div class="menu-row-icon" style="background:#000;border:1px solid var(--border2);">🖤</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="amoledBlack">🖤 Dark / AMOLED</div><div class="menu-row-sub" data-i18n="amoledDesc">Black theme — best for OLED</div></div>
+          <div class="rv green" id="chk-amoled">✓ Active</div>
+        </div>
+        <div class="menu-row" onclick="setTheme('malawi')">
+          <div class="menu-row-icon" style="background:#f5f5f5;border:1px solid #ddd;">☀️</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="lightMode">🇲🇼 Malawi Theme</div><div class="menu-row-sub" data-i18n="lightDesc">Red, White & Green — Default</div></div>
+          <div class="rv green" id="chk-malawi"></div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="notifications">Notifications</div>
+      <div class="menu-card">
+        <div class="menu-row">
+          <div class="menu-row-icon" style="background:rgba(0,180,0,.1);">🔔</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="pushNotif">Push Notifications</div></div>
+          <div class="toggle on" id="notif-toggle" onclick="this.classList.toggle('on');toast(this.classList.contains('on')?'🔔 Notifications on':'🔕 Notifications off')"></div>
+        </div>
+        <div class="menu-row">
+          <div class="menu-row-icon" style="background:rgba(37,211,102,.1);">💬</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="msgNotif">Message Alerts</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label">PWA</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="installPWA()">
+          <div class="menu-row-icon" style="background:rgba(0,80,200,.1);">📲</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="installApp">Install App</div><div class="menu-row-sub" data-i18n="installDesc">Add to home screen</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="data">Data</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="clearSearchHistory();toast('✓ Cache cleared','g')">
+          <div class="menu-row-icon" style="background:rgba(200,100,0,.1);">🗑️</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="clearCache">Clear Cache</div><div class="menu-row-sub" data-i18n="clearCacheDesc">Clear search history &amp; cache</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ SECURITY ████ -->
+<div class="screen" id="s-security">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="security">Security</h2>
+  </div>
+  <div class="scroll-free">
+    <div style="padding:14px 0;">
+      <div class="security-item">
+        <div class="si-icon">🔐</div>
+        <div class="si-text" data-i18n="password">Password</div>
+        <div class="si-status">••••••••</div>
+      </div>
+      <div class="security-item" style="cursor:pointer;" onclick="showChangePassword()">
+        <div class="si-icon">🔑</div>
+        <div class="si-text" data-i18n="changePassword">Change Password</div>
+        <div class="menu-row-right">›</div>
+      </div>
+      <div class="security-item">
+        <div class="si-icon">📧</div>
+        <div class="si-text" id="security-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b3c3d6c7d6c1f3dcc7d6d0dbca9ddec4">[email&#160;protected]</a></div>
+        <div class="si-status" style="color:var(--G-bright);">✅ Verified</div>
+      </div>
+      <div class="security-item">
+        <div class="si-icon">📱</div>
+        <div class="si-text" data-i18n="twoFactor">Two-Factor Auth</div>
+        <div class="toggle" id="2fa-toggle" onclick="this.classList.toggle('on');toast(this.classList.contains('on')?'🔐 2FA enabled':'2FA disabled',this.classList.contains('on')?'g':'r')"></div>
+      </div>
+      <div class="security-item">
+        <div class="si-icon">🌐</div>
+        <div class="si-text" data-i18n="activeSessions">Active Sessions</div>
+        <div class="si-status">1 device</div>
+      </div>
+    </div>
+    <div style="padding:14px;">
+      <div class="fld" id="change-pw-form" style="display:none;gap:12px;margin-bottom:14px;">
+        <label data-i18n="currentPassword">Current Password</label>
+        <input type="password" id="old-pass" placeholder="Current password" class="f-input"/>
+        <label data-i18n="newPassword">New Password</label>
+        <input type="password" id="new-pass" placeholder="New password (min 6 chars)" class="f-input"/>
+        <button class="btn-g" onclick="changePassword()" data-i18n="updatePassword">Update Password</button>
+        <button class="btn-ghost" onclick="document.getElementById('change-pw-form').style.display='none'" data-i18n="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ MY LISTINGS ████ -->
+<div class="screen" id="s-my-listings">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="myListings">My Listings</h2>
+    <div class="topbar-btn" onclick="go('s-sell','s-my-listings')">＋</div>
+  </div>
+  <div class="scroll-free">
+    <div class="my-listings-grid" id="my-listings-grid"></div>
+    <div id="my-listings-empty" style="display:none;">
+      <div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title" data-i18n="noListings">No Listings Yet</div><div class="empty-desc" data-i18n="noListingsDesc">Post your first product listing.</div><div class="empty-action"><button class="btn-g" style="width:auto;padding:12px 24px;" onclick="go('s-sell','s-my-listings')">＋ <span data-i18n="postListing">Post Listing</span></button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ LANG ████ -->
+<div class="screen" id="s-lang">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="language">Language</h2>
+  </div>
+  <div class="lang-search"><input type="text" oninput="filterLangs(this.value)" data-i18n-placeholder="searchLang" placeholder="Search language…"/></div>
+  <div class="scroll-free" id="lang-list"></div>
+</div>
+
+<!-- ████ TUTORIAL ████ -->
+<div class="screen" id="s-tutorial">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="howToUse">How to Use</h2>
+  </div>
+  <div class="tutorial-inner">
+    <div id="tutorial-slide-wrap"></div>
+    <div class="tutorial-dots" id="tutorial-dots"></div>
+  </div>
+  <div class="tutorial-btns">
+    <button class="btn-g" id="tutorial-next" onclick="tutorialNext()">Next →</button>
+    <button class="tutorial-skip" id="tutorial-skip" onclick="back()" data-i18n="skip">Skip</button>
+  </div>
+</div>
+
+<!-- ████ REPORT BUG ████ -->
+<div class="screen" id="s-report-bug">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="reportBug">Report a Bug</h2>
+  </div>
+  <div class="scroll-free">
+    <div style="padding:16px;display:flex;flex-direction:column;gap:14px;padding-bottom:40px;">
+      <p style="font-size:13px;color:var(--muted2);line-height:1.5;" data-i18n="bugDesc">Help us improve Kumsika! Describe the issue you encountered.</p>
+      <div>
+        <div class="f-label" data-i18n="bugType">Bug Type</div>
+        <div class="bug-type-grid">
+          <div class="bug-type-chip selected" onclick="selectBugType('crash',this)"><div class="btc-icon">💥</div><div class="btc-label">App Crash</div></div>
+          <div class="bug-type-chip" onclick="selectBugType('ui',this)"><div class="btc-icon">🎨</div><div class="btc-label">UI Issue</div></div>
+          <div class="bug-type-chip" onclick="selectBugType('performance',this)"><div class="btc-icon">🐌</div><div class="btc-label">Slow / Laggy</div></div>
+          <div class="bug-type-chip" onclick="selectBugType('payment',this)"><div class="btc-icon">💳</div><div class="btc-label">Payment</div></div>
+        </div>
+      </div>
+      <div class="fld"><label data-i18n="bugDescription">Describe the issue</label><textarea id="bug-desc" rows="4" placeholder="What happened? What were you trying to do?"></textarea></div>
+      <div class="fld"><label data-i18n="deviceInfo">Your Device (optional)</label><input type="text" id="bug-device" placeholder="e.g. Samsung Galaxy A52"/></div>
+      <button class="btn-g" onclick="submitBugReport()" data-i18n="submitReport">📤 Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ ABOUT ████ -->
+<div class="screen" id="s-about">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 data-i18n="aboutApp">About Kumsika</h2>
+  </div>
+  <div class="scroll-free">
+    <div class="about-hero">
+      <div class="about-logo"><div class="mw-flag"><div class="mw-black"><div class="mw-sun" style="width:28px;height:28px;"></div></div><div class="mw-red"></div><div class="mw-green"></div></div></div>
+      <div class="about-name"><em style="color:var(--G-bright);font-style:normal;">Kum</em>sika</div>
+      <div class="about-version">Version 5.0.0 · O-Techy Company</div>
+      <div class="about-description">Kumsika is Malawi's #1 online marketplace connecting buyers and sellers across all 28 districts. Buy, sell, and connect — powered by technology built in Malawi. 🇲🇼</div>
+    </div>
+    <div class="p-sec-lbl" style="margin-top:8px;" data-i18n="contact">Contact</div>
+    <div class="contact-row" onclick="window.open('mailto:info@otechy.mw','_blank')"><div class="ci">📧</div><div class="ct"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="51383f373e113e25343239287f3c26">[email&#160;protected]</a></div></div>
+    <div class="contact-row" onclick="openWhatsApp('O-Techy','support','','265888258180')"><div class="ci">💬</div><div class="ct">WhatsApp Support</div></div>
+    <div class="contact-row" onclick="window.open('https://otechy.mw','_blank')"><div class="ci">🌐</div><div class="ct">www.otechy.mw</div></div>
+    <div class="contact-row" onclick="window.open('https://facebook.com/OtechyMW','_blank')"><div class="ci">📘</div><div class="ct">Facebook: @OtechyMW</div></div>
+    <div style="text-align:center;padding:24px;font-size:11px;color:var(--muted);line-height:1.6;">
+      Made with ❤️ in Malawi 🇲🇼<br/>© 2026 O-Techy Company. All rights reserved.
+    </div>
+  </div>
+</div>
+
+<!-- ████ ADMIN ████ -->
+<div class="screen" id="s-admin">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 style="color:#cc88ff;">⚡ Admin Dashboard</h2>
+  </div>
+  <div class="admin-tabs">
+    <button class="admin-tab on" onclick="adminTab('overview',this)" data-i18n="overview">Overview</button>
+    <button class="admin-tab" onclick="adminTab('shops',this)" data-i18n="shops">Shops</button>
+    <button class="admin-tab" onclick="adminTab('products',this)" data-i18n="products">Products</button>
+    <button class="admin-tab" onclick="adminTab('users',this)" data-i18n="users">Users</button>
+  </div>
+  <div class="scroll-free">
+    <!-- Overview Panel -->
+    <div id="admin-overview-panel">
+      <div class="admin-overview">
+        <div class="admin-stat-card"><div class="asn" id="a-stat-shops">6</div><div class="asl">Total Shops</div></div>
+        <div class="admin-stat-card"><div class="asn" id="a-stat-products">12</div><div class="asl">Listings</div></div>
+        <div class="admin-stat-card"><div class="asn" id="a-stat-users">4</div><div class="asl">Users</div></div>
+        <div class="admin-stat-card"><div class="asn" style="color:#F5A623;">3</div><div class="asl">Active Shops</div></div>
+      </div>
+    </div>
+    <!-- Shops Panel -->
+    <div id="admin-shops-panel" style="display:none;" class="scroll-free">
+      <div id="admin-shops-list" class="admin-shops-list"></div>
+    </div>
+    <!-- Products Panel -->
+    <div id="admin-products-panel" style="display:none;" class="scroll-free">
+      <div id="admin-products-list" class="admin-products-list"></div>
+    </div>
+    <!-- Users Panel -->
+    <div id="admin-users-panel" style="display:none;" class="scroll-free">
+      <div id="admin-users-list" class="admin-users-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ PROOF SUBMITTED MODAL ████ -->
+<div class="confirm-modal" id="proof-submitted-modal">
+  <div class="confirm-card" style="text-align:center;">
+    <div style="font-size:50px;margin-bottom:12px;">🎉</div>
+    <h3 style="margin-bottom:8px;">Proof Submitted!</h3>
+    <p>Our team will review your payment within <strong>24 hours</strong>. Once approved, your shop will be activated automatically.</p>
+    <div style="margin:12px 0;padding:10px 12px;background:var(--G-dim);border:1px solid rgba(51,158,53,.2);border-radius:10px;font-size:12px;color:var(--G);font-weight:700;">
+      📞 Support: WhatsApp 0888 258 180
+    </div>
+    <div class="confirm-btns">
+      <button class="btn-g" onclick="closeModal('proof-submitted-modal')">✓ Got It!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ PREMIUM PAY SCREEN ████ -->
+<div class="screen" id="s-premium-pay">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()">←</button>
+    <h2 style="font-family:var(--font-display);font-size:16px;">⭐ Premium Shop</h2>
+  </div>
+  <div class="scroll-free" style="padding-bottom:40px;">
+
+    <!-- Hero -->
+    <div class="prem-hero">
+      <div class="prem-flag-stripe"></div>
+      <div class="prem-hero-body">
+        <div class="prem-crown">🏪</div>
+        <div class="prem-title">Open Your Shop</div>
+        <div class="prem-sub">Verified shop · Unlimited listings · All 28 districts</div>
+      </div>
+    </div>
+
+    <!-- Plan selector -->
+    <div style="padding:16px 14px 0;">
+      <div class="prem-section-label">CHOOSE YOUR PLAN</div>
+      <div class="prem-plans">
+        <div class="prem-plan-card active" id="pp-month" onclick="setPremPlan('month')">
+          <div class="pp-badge">Popular</div>
+          <div class="pp-period">Monthly</div>
+          <div class="pp-price">MK 5,000</div>
+          <div class="pp-note">Per 30 days</div>
+          <div class="pp-check" id="ppc-month">✓</div>
+        </div>
+        <div class="prem-plan-card" id="pp-year" onclick="setPremPlan('year')">
+          <div class="pp-badge save">Save MK 20k!</div>
+          <div class="pp-period">Yearly</div>
+          <div class="pp-price">MK 40,000</div>
+          <div class="pp-note">= MK 3,333/mo</div>
+          <div class="pp-check" id="ppc-year"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Benefits -->
+    <div style="padding:16px 14px 0;">
+      <div class="prem-section-label">WHAT YOU GET</div>
+      <div class="prem-benefits">
+        <div class="prem-benefit"><span class="pb-icon">✅</span><span class="pb-text">Verified shop with official green badge</span></div>
+        <div class="prem-benefit"><span class="pb-icon">📦</span><span class="pb-text">Unlimited product listings</span></div>
+        <div class="prem-benefit"><span class="pb-icon">🔝</span><span class="pb-text">Priority placement in search results</span></div>
+        <div class="prem-benefit"><span class="pb-icon">📊</span><span class="pb-text">Sales & views analytics dashboard</span></div>
+        <div class="prem-benefit"><span class="pb-icon">💬</span><span class="pb-text">Direct buyer leads via WhatsApp</span></div>
+        <div class="prem-benefit"><span class="pb-icon">🇲🇼</span><span class="pb-text">Visible across all 28 districts</span></div>
+      </div>
+    </div>
+
+    <!-- Payment method -->
+    <div style="padding:16px 14px 0;">
+      <div class="prem-section-label">PAYMENT METHOD</div>
+      <div class="prem-method-tabs">
+        <div class="pmt-tab active" id="pmt-tnm" onclick="setPayMethod('tnm')">
+          <div class="pmt-icon" style="background:linear-gradient(135deg,#002299,#0044cc);">📱</div>
+          <div class="pmt-name">TNM Mpamba</div>
+        </div>
+        <div class="pmt-tab" id="pmt-airtel" onclick="setPayMethod('airtel')">
+          <div class="pmt-icon" style="background:linear-gradient(135deg,#bb0000,#ee2222);">📲</div>
+          <div class="pmt-name">Airtel Money</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div style="padding:12px 14px 0;">
+      <div class="prem-section-label">HOW TO PAY</div>
+      <div class="prem-instructions" id="pay-instructions-card">
+        <div class="pi-amount-row">
+          <div class="pi-amount-label">Amount to Send</div>
+          <div class="pi-amount-value" id="pi-amount-display">MK 5,000</div>
+        </div>
+        <div class="pi-steps">
+          <div class="pi-step">
+            <div class="pi-step-num">1</div>
+            <div class="pi-step-text" id="pi-step1">Open <strong>TNM Mpamba</strong> on your phone</div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">2</div>
+            <div class="pi-step-text">Select <strong>"Send Money"</strong> or <strong>"Pay Business"</strong></div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">3</div>
+            <div class="pi-step-text">Send to this number (tap to copy 👇):</div>
+          </div>
+        </div>
+        <!-- The BIG phone number -->
+        <div class="pi-number-card" id="pi-number-card" onclick="copyPayNumber()">
+          <div class="pi-network-badge" id="pi-network-badge">TNM Mpamba</div>
+          <div class="pi-phone" id="pi-phone-display">0999 626 944</div>
+          <div class="pi-copy-hint">👆 Tap to copy number</div>
+        </div>
+        <div class="pi-steps" style="margin-top:4px;">
+          <div class="pi-step">
+            <div class="pi-step-num">4</div>
+            <div class="pi-step-text">Enter exact amount: <strong id="pi-amount-step" style="color:var(--R);">MK 5,000</strong></div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">5</div>
+            <div class="pi-step-text">Reference/note: <strong>Your name + "Kumsika"</strong></div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">6</div>
+            <div class="pi-step-text">Take a <strong>screenshot</strong> of the confirmation SMS</div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">7</div>
+            <div class="pi-step-text">Upload screenshot below — approved within <strong>24 hours</strong> ✅</div>
+          </div>
+        </div>
+        <div class="pi-alt-note" id="pi-alt-note">
+          💡 You can also pay to: <strong>0888 258 180</strong> (same account)
+        </div>
+      </div>
+    </div>
+
+    <!-- Your details form -->
+    <div style="padding:12px 14px 0;">
+      <div class="prem-section-label">YOUR PAYMENT DETAILS</div>
+      <div class="prem-form-card">
+        <div class="fld" style="margin-bottom:12px;">
+          <label>Your Mobile Money Number *</label>
+          <input type="tel" id="proof-sender-number" placeholder="e.g. 0888 123 456 or 0999 123 456"
+                 class="f-input" oninput="validateProofForm()"/>
+          <div class="f-err" id="proof-num-err">Please enter your phone number (min 9 digits)</div>
+        </div>
+        <div class="fld" style="margin-bottom:12px;">
+          <label>Transaction Reference / ID <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+          <input type="text" id="proof-txn-ref" placeholder="e.g. TXN1234567890" class="f-input"/>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px;">Found in your Airtel/TNM confirmation SMS</div>
+        </div>
+        <div class="fld">
+          <label>Payment Screenshot *</label>
+          <div class="proof-upload-zone" id="proof-upload-zone" onclick="triggerProofUpload()">
+            <div id="proof-upload-inner">
+              <div class="puz-icon">📷</div>
+              <div class="puz-title">Tap to upload screenshot</div>
+              <div class="puz-sub">JPEG or PNG · max 5MB</div>
+            </div>
+            <div id="proof-preview-inner" style="display:none;text-align:center;">
+              <img id="proof-img-preview" class="puz-preview-img" src="" alt="Payment proof"/>
+              <div class="puz-change">📷 Tap to change screenshot</div>
+            </div>
+          </div>
+          <input type="file" id="proof-file-input" accept="image/*" style="display:none;" onchange="handleProofFile(this)"/>
+          <div class="f-err" id="proof-img-err">Please upload your payment screenshot</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div style="padding:14px 14px 0;">
+      <button class="btn-g" id="submit-proof-btn" onclick="submitPaymentProof()" disabled style="opacity:.4;">
+        📤 Submit Payment Proof
+      </button>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.7;">
+        We manually review every payment within <strong style="color:var(--text2);">24 hours</strong>.<br/>
+        You'll be notified when your shop is activated. 🇲🇼
+      </div>
+    </div>
+
+    <!-- WhatsApp help -->
+    <div style="padding:12px 14px 0;">
+      <button class="btn-wa" onclick="openWhatsApp('Kumsika','Premium Activation','','265888258180')">
+        💬 Questions? Chat us on WhatsApp
+      </button>
+    </div>
+
+    <div style="text-align:center;padding:20px 14px 8px;font-size:11px;color:var(--muted);">
+      Already submitted your proof? We'll approve within 24 hours. 🕐
+    </div>
+  </div>
+</div>
+</div><!-- /shell -->
+
+
+
+/* ═══════════════════════════════════════════════════════════════
+   KUMSIKA PRODUCTION OVERRIDES
+   White splash, scroll fixes, improved About section
+═══════════════════════════════════════════════════════════════ */
+
+/* ── SPLASH SCREEN — clean white with Malawi accent ─────────── */
+#s-splash {
+  background: #FFFFFF !important;
+  align-items: center;
+  justify-content: center;
+}
+#s-splash .splash-bg {
+  background: radial-gradient(ellipse 70% 45% at 50% 55%, rgba(51,158,53,.10) 0%, rgba(206,17,38,.04) 60%, transparent 100%);
+}
+#s-splash .splash-wordmark { color: #0A1628 !important; }
+#s-splash .splash-wordmark em { color: #3DB33F !important; }
+#s-splash .splash-sub      { color: rgba(10,22,40,.50) !important; }
+#s-splash .splash-powered  { color: rgba(10,22,40,.35) !important; }
+#s-splash .splash-loader   { background: rgba(0,0,0,.08) !important; }
+#s-splash .splash-ring     { border-color: rgba(51,158,53,.25); }
+#s-splash .splash-ring2    { border-color: rgba(51,158,53,.10); }
+#s-splash .splash-icon     { box-shadow: 0 0 40px rgba(51,158,53,.20), 0 12px 40px rgba(0,0,0,.12); }
+
+/* ── SCROLL RESET — no clipping ─────────────────────────────── */
+html, body {
+  overflow-x: hidden;
+  min-height: 100dvh;
+  min-height: 100vh; /* fallback */
+}
+#shell {
+  height: 100vh; /* base fallback */
+  height: 100dvh;
+  height: 100svh;
+  min-height: 100vh;
+}
+
+/* ── ABOUT KUMSIKA ──────────────────────────────────────────── */
+.about-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.about-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  text-align: center;
+}
+.about-stat-num  { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--R); }
+.about-stat-lbl  { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 600; }
+
+.about-mission-card {
+  margin: 0 14px 12px;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--R);
+  background: var(--R-dim);
+  padding: 14px 16px;
+}
+.about-mission-card.green {
+  border-left-color: var(--G);
+  background: var(--G-dim);
+}
+.about-mission-label { font-size: 10px; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--muted2); margin-bottom: 5px; }
+.about-mission-text  { font-size: 13px; color: var(--text2); line-height: 1.55; font-weight: 500; }
+
+.about-district-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  font-size: 11px; font-weight: 600; color: var(--text2);
+  margin: 3px;
+}
+.about-districts-wrap { display: flex; flex-wrap: wrap; padding: 8px 14px 14px; }
+
+.about-flag-stripe {
+  height: 6px;
+  background: linear-gradient(90deg, #000000 33.3%, #CE1126 33.3%, #CE1126 66.6%, #339E35 66.6%);
+  margin: 14px 0 0;
+}
+
+/* ═══════════════════════════════════════════════
+   KUMSIKA v8 — ADDITIONS
+   ═══════════════════════════════════════════════ */
+
+/* Better back button */
+.back-btn, .det-back {
+  font-size: 26px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+  transition: background .15s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.back-btn:active, .det-back:active { background: var(--border); }
+
+/* Social login buttons */
+.btn-social { transition: opacity .15s, transform .1s; border-radius: var(--radius-sm) !important; }
+.btn-social:active { opacity: .8; transform: scale(.98); }
+.btn-social.google { color: #333 !important; }
+
+/* Notification badge on nav */
+#notif-badge {
+  position: absolute;
+  top: 2px; right: 4px;
+  background: var(--R);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+}
+
+/* Home loading bar */
+#home-loading {
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--muted);
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+}
+
+/* Admin payment row */
+.admin-row { background: var(--surface); }
+
+/* Subscription expiry badge in shop */
+#sd-subscription {
+  display: none;
+  font-size: 11px;
+  color: var(--G-bright);
+  background: var(--G-dim);
+  border-radius: 8px;
+  padding: 4px 10px;
+  margin: 6px 0;
+  font-weight: 600;
+}
+
+/* Detail gallery */
+.detail-gallery {
+  display: flex;
+  gap: 6px;
+  padding: 6px 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.detail-gallery-img {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.detail-gallery-img.active { border-color: var(--G-bright); }
+
+/* District filter row */
+.district-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text);
+}
+.district-check { font-size: 11px; color: var(--muted); font-weight: 700; }
+.district-check.on { color: var(--G-bright); }
+
+/* Plan card selected state */
+.plan-card.selected { border-color: var(--G-bright); background: var(--G-dim); }
+
+/* Photo slot */
+.photo-slot {
+  width: 90px; height: 90px;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; gap: 4px;
+  color: var(--muted); font-size: 12px;
+  flex-shrink: 0;
+}
+.photo-slot.filled { border-style: solid; border-color: var(--G-bright); }
+
+/* Listing row in my-listings */
+.listing-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.listing-img {
+  width: 56px; height: 56px;
+  border-radius: 10px;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0;
+}
+.listing-info { flex: 1; min-width: 0; }
+.listing-name { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.listing-price { color: var(--G-bright); font-size: 13px; font-weight: 700; }
+.listing-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* Conv item */
+.conv-item { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.conv-av { width: 44px; height: 44px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; overflow: hidden; position: relative; }
+.conv-body { flex: 1; min-width: 0; }
+.conv-name { font-weight: 700; font-size: 14px; }
+.conv-preview { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.conv-time { font-size: 10px; color: var(--muted); }
+.conv-badge { background: var(--G-bright); color: #fff; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+
+/* ─── KUMSIKA v10 FIXES ─────────────────────────────── */
+/* Ensure detail gallery is positioned correctly */
+#detail-main-img-area {
+  position: relative !important;
+  height: 260px !important;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+}
+/* Back button SVG alignment */
+.back-btn svg, .det-back svg {
+  display: block;
+  pointer-events: none;
+}
+.back-btn {
+  display: flex; align-items: center; justify-content: center;
+}
+/* Splash logo */
+.splash-icon img { display: block; }
+/* App name below splash logo */
+.splash-wordmark {
+  margin-top: 12px;
+}
+/* Premium plan cards */
+.prem-plan-card.active {
+  border-color: var(--G-bright) !important;
+  box-shadow: 0 0 0 2px rgba(0,204,0,.2);
+}
+.pmt-tab.active {
+  border-color: var(--G-bright) !important;
+  background: var(--G-dim);
+}

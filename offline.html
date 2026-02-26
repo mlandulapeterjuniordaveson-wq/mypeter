@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Kumsika — Offline</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    background: #FFFFFF; display: flex; align-items: center;
+    justify-content: center; min-height: 100vh; padding: 20px;
+  }
+  .card {
+    text-align: center; max-width: 320px;
+  }
+  .flag {
+    width: 72px; height: 72px; border-radius: 20px; overflow: hidden;
+    margin: 0 auto 20px; display: flex; flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,.15);
+  }
+  .fb { flex: 1; background: #000; display: flex; align-items: center; justify-content: center; }
+  .fr { flex: 1; background: #CE1126; }
+  .fg { flex: 1; background: #339E35; }
+  .sun {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: radial-gradient(circle, #FF6644, #CE1126);
+  }
+  h1 { font-size: 28px; font-weight: 800; color: #0A0A0A; letter-spacing: -1px; }
+  h1 em { color: #339E35; font-style: normal; }
+  p { font-size: 14px; color: #666; margin: 12px 0 24px; line-height: 1.6; }
+  button {
+    padding: 14px 28px; background: #CE1126; color: #fff;
+    border: none; border-radius: 12px; font-size: 15px; font-weight: 700;
+    cursor: pointer;
+  }
+  .note { font-size: 11px; color: #999; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="flag">
+    <div class="fb"><div class="sun"></div></div>
+    <div class="fr"></div>
+    <div class="fg"></div>
+  </div>
+  <h1><em>Kum</em>sika</h1>
+  <p>You're offline. Check your connection and try again.<br/>Your data is saved locally.</p>
+  <button onclick="location.reload()">🔄 Try Again</button>
+  <div class="note">Powered by O-Techy Company 🇲🇼</div>
+</div>
+</body>
+</html>

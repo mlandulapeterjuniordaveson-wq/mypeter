@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="malawi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#CE1126"/>
+<meta name="description" content="Kumsika — Malawi's #1 Marketplace. Buy, sell and connect across all 28 districts. Powered by O-Techy Company."/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Kumsika"/>
+<title>Kumsika — Malawi's #1 Marketplace</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="assets/logo/kumsika-logo.svg" type="image/svg+xml"/>
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+
+<div id="shell">
+
+<div class="offline-bar" id="offline-bar">📡 Offline — Cached content showing</div>
+<div class="toast" id="toast"></div>
+<!-- Loading indicator for home data -->
+<div id="home-loading" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:8px 16px;font-size:12px;color:var(--muted);display:none;align-items:center;gap:8px;">
+  <div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Loading products…
+</div>
+
+<!-- ████ FILTER MODAL ████ -->
+<div class="modal-backdrop" id="filter-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" data-i18n="filterSort">Filter &amp; Sort</div>
+    <div class="p-sec-lbl" style="padding:0 0 8px;" data-i18n="sortByPrice">Sort By Price</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn-sm btn-sm-g" id="sort-low-btn" style="flex:1;" onclick="setSortBtnPrice('low')" data-i18n="priceLow">↑ Low First</button>
+      <button class="btn-sm btn-sm-y" id="sort-high-btn" style="flex:1;" onclick="setSortBtnPrice('high')" data-i18n="priceHigh">↓ High First</button>
+    </div>
+    <div class="p-sec-lbl" style="padding:0 0 8px;" data-i18n="filterByDistrict">Filter By District</div>
+    <div id="district-filter-list" style="background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);overflow:hidden;max-height:220px;overflow-y:auto;"></div>
+    <div style="display:flex;gap:8px;margin-top:10px;margin-bottom:6px;">
+      <button class="btn-sm btn-sm-g" style="flex:1;" onclick="selectAllDistricts()">✓ Select All</button>
+      <button class="btn-sm btn-sm-y" style="flex:1;" onclick="clearAllDistricts()">✕ Clear All</button>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;">
+      <button class="btn-ghost" style="flex:1;" onclick="closeModal('filter-modal')" data-i18n="cancel">Cancel</button>
+      <button class="btn-g" style="flex:1;" onclick="applyFilter()">✓ <span data-i18n="apply">Apply</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ PAYMENT MODAL ████ -->
+<div class="modal-backdrop" id="pay-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--R);">🏪 Open Your Premium Shop</div>
+    <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;line-height:1.5;">
+      Get a verified shop and start selling to buyers across all 28 districts of Malawi.
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div class="plan-card selected" id="plan-month" onclick="selectPlan('month')">
+        <div class="plan-period">Monthly</div>
+        <div class="plan-price">MK 5,000</div>
+        <div class="plan-note">per month</div>
+      </div>
+      <div class="plan-card" id="plan-year" onclick="selectPlan('year')">
+        <div class="plan-period">Yearly</div>
+        <div class="plan-price">MK 40,000</div>
+        <div class="plan-note">Save MK 20,000 🎉</div>
+      </div>
+    </div>
+    <div style="background:var(--R-dim);border:1px solid rgba(206,17,38,.2);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--R);font-weight:600;line-height:1.5;">
+      📱 Pay via <strong>Airtel Money</strong> or <strong>TNM Mpamba</strong><br/>
+      Numbers: <strong>0888 258 180</strong> or <strong>0999 626 944</strong>
+    </div>
+    <button class="btn-g" onclick="closeModal('pay-modal');go('s-premium-pay',APP.screen);" style="margin-bottom:8px;">
+      💳 View Full Payment Instructions
+    </button>
+    <button class="btn-ghost" onclick="closeModal('pay-modal')">Maybe Later</button>
+  </div>
+</div>
+
+
+<!-- ████ LOGOUT CONFIRM ████ -->
+<div class="confirm-modal" id="logout-confirm">
+  <div class="confirm-card">
+    <h3 data-i18n="signOutTitle">Sign Out?</h3>
+    <p data-i18n="signOutDesc">You will be signed out. You can sign back in anytime.</p>
+    <div class="confirm-btns">
+      <button class="btn-ghost" onclick="closeModal('logout-confirm')" data-i18n="cancel">Cancel</button>
+      <button class="btn-r" onclick="doLogout()" data-i18n="signOut">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ ADMIN CONFIRM ████ -->
+<div class="confirm-modal" id="admin-confirm">
+  <div class="confirm-card">
+    <h3 id="admin-confirm-title">Confirm Action</h3>
+    <p id="admin-confirm-desc">Are you sure?</p>
+    <div class="confirm-btns">
+      <button class="btn-ghost" onclick="closeModal('admin-confirm')">Cancel</button>
+      <button class="btn-r" id="admin-confirm-btn" onclick="doAdminAction()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ PWA INSTALL ████ -->
+<div class="confirm-modal" id="pwa-modal">
+  <div class="confirm-card">
+    <h3>📲 Install Kumsika</h3>
+    <p>Add Kumsika to your home screen for the best experience — works offline too!</p>
+    <div class="confirm-btns">
+      <button class="btn-ghost" onclick="closeModal('pwa-modal')">Later</button>
+      <button class="btn-g" onclick="installPWA()">Install App</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ SPLASH ████ -->
+<div class="screen active" id="s-splash">
+  <div class="splash-bg"></div>
+  <div class="splash-flag-wrap">
+    <div class="splash-ring"></div>
+    <div class="splash-ring2"></div>
+    <div class="splash-icon">
+      <img src="assets/logo/kumsika-logo.svg" alt="Kumsika" style="width:80px;height:80px;border-radius:50%;box-shadow:0 0 32px rgba(0,200,0,.4);"/>
+    </div>
+  </div>
+  <div class="splash-wordmark"><em>Kum</em>sika</div>
+  <div class="splash-sub">Malawi's #1 Marketplace · 2026 ™</div>
+  <div class="splash-powered">Powered by <span>O-Techy Company</span></div>
+  <div class="splash-loader"><div class="splash-loader-fill"></div></div>
+</div>
+
+<!-- ████ LOGIN ████ -->
+<div class="screen" id="s-login">
+  <div class="auth-hero">
+    <div class="auth-hero-glow"></div>
+    <div class="auth-hero-line"></div>
+    <div class="auth-flag-icon">
+      <div class="mw-flag">
+        <div class="mw-black"><div class="mw-sun" style="width:18px;height:18px;"></div></div>
+        <div class="mw-red"></div><div class="mw-green"></div>
+      </div>
+    </div>
+    <h1 data-i18n="welcomeBack">Welcome back 👋<br/>Buy &amp; sell in<br/><span style="color:var(--G-bright)">Malawi.</span></h1>
+    <p data-i18n="trustedBy">Trusted by thousands across Malawi</p>
+  </div>
+  <div class="auth-form">
+    <div class="lang-pill" onclick="go('s-lang','s-login')">
+      <span class="globe">🌍</span><span id="cur-lang">English</span><span class="arr">▾</span>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="emailAddress">Email Address</label>
+      <input class="f-input" type="email" id="l-email" placeholder="you@example.com" oninput="validateEmailField()" autocomplete="email"/>
+      <div class="f-err" id="e-err" data-i18n="validEmail">Enter a valid email address</div>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="password">Password</label>
+      <div class="pw-wrap">
+        <input class="f-input" type="password" id="l-pass" placeholder="••••••••" oninput="validatePassField()" autocomplete="current-password"/>
+        <span class="pw-eye" onclick="togglePw('l-pass',this)">👁️</span>
+      </div>
+      <div class="f-err" id="p-err" data-i18n="passMin">Password must be 6+ characters</div>
+    </div>
+    <button class="btn-g" id="login-btn" onclick="doLogin()"><span id="login-btn-text" data-i18n="signIn">Sign In</span></button>
+    <div class="div-line"><span data-i18n="or">or</span></div>
+    <button class="btn-ghost" onclick="goHome(true)" data-i18n="browseGuest">Browse as Guest</button>
+    <div class="div-line"><span>or sign in with</span></div>
+    <div style="display:flex;gap:10px;margin-bottom:8px;">
+      <button class="btn-social google" onclick="doGoogleLogin()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border:1.5px solid #ddd;border-radius:var(--radius-sm);background:#fff;color:#444;font-weight:600;font-size:13px;cursor:pointer;">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Google
+      </button>
+      <button class="btn-social facebook" onclick="doFacebookLogin()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border:1.5px solid #1877F2;border-radius:var(--radius-sm);background:#1877F2;color:#fff;font-weight:600;font-size:13px;cursor:pointer;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook
+      </button>
+    </div>
+    <p style="text-align:center;font-size:12px;color:var(--muted);">
+      <span data-i18n="noAccount">New here?</span> <span style="color:var(--G-bright);font-weight:700;cursor:pointer;" onclick="go('s-signup','s-login')" data-i18n="createAccount">Create Account</span>
+    </p>
+  </div>
+</div>
+
+<!-- ████ SIGN UP ████ -->
+<div class="screen" id="s-signup">
+  <div class="auth-hero">
+    <div class="auth-hero-glow"></div>
+    <div class="auth-hero-line"></div>
+    <div class="auth-flag-icon">
+      <div class="mw-flag">
+        <div class="mw-black"><div class="mw-sun" style="width:18px;height:18px;"></div></div>
+        <div class="mw-red"></div><div class="mw-green"></div>
+      </div>
+    </div>
+    <h1 data-i18n="joinKumsika">Join Kumsika 🎉<br/>Start selling in<br/><span style="color:var(--G-bright)">Malawi.</span></h1>
+    <p data-i18n="freeToJoin">Free to join. Thousands of buyers waiting.</p>
+  </div>
+  <div class="auth-form">
+    <div>
+      <label class="f-label" data-i18n="fullName">Full Name</label>
+      <input class="f-input" type="text" id="su-name" placeholder="e.g. Grace Phiri" oninput="validateSignupField('su-name','su-name-err',v=>v.trim().length>=2,'Name must be at least 2 characters')"/>
+      <div class="f-err" id="su-name-err">Name must be at least 2 characters</div>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="emailAddress">Email Address</label>
+      <input class="f-input" type="email" id="su-email" placeholder="you@example.com" oninput="validateSignupField('su-email','su-email-err',v=>v.includes('@')&&v.includes('.'),'Enter a valid email')"/>
+      <div class="f-err" id="su-email-err">Enter a valid email</div>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="phoneNumber">Phone Number</label>
+      <input class="f-input" type="tel" id="su-phone" placeholder="+265 9XX XXX XXX" oninput="validateSignupField('su-phone','su-phone-err',v=>v.trim().length>=9,'Enter a valid phone number')"/>
+      <div class="f-err" id="su-phone-err">Enter a valid phone number</div>
+    </div>
+    <div>
+      <label class="f-label" data-i18n="password">Password</label>
+      <div class="pw-wrap">
+        <input class="f-input" type="password" id="su-pass" placeholder="Min. 6 characters" oninput="checkPasswordStrength(this.value)" autocomplete="new-password"/>
+        <span class="pw-eye" onclick="togglePw('su-pass',this)">👁️</span>
+      </div>
+      <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+      <div class="strength-label" id="strength-label"></div>
+      <div class="f-err" id="su-pass-err">Password must be 6+ characters</div>
+    </div>
+    <div class="fld">
+      <label data-i18n="district">District</label>
+      <select id="su-district">
+        <option value="">Choose district…</option>
+        <option>Lilongwe</option><option>Blantyre</option><option>Mzuzu</option>
+        <option>Zomba</option><option>Kasungu</option><option>Mangochi</option>
+        <option>Salima</option><option>Dedza</option><option>Karonga</option>
+        <option>Ntchisi</option><option>Dowa</option><option>Nkhotakota</option>
+        <option>Balaka</option><option>Chiradzulu</option><option>Chikwawa</option>
+        <option>Nsanje</option><option>Thyolo</option><option>Mulanje</option>
+        <option>Phalombe</option><option>Machinga</option><option>Mwanza</option>
+        <option>Neno</option><option>Lilongwe Rural</option><option>Other</option>
+      </select>
+    </div>
+    <div class="toggle-row">
+      <div class="tl">
+        <div class="tn" data-i18n="iAmSeller">I am a Seller</div>
+        <div class="ts" data-i18n="sellerDesc">I want to open a shop and sell products</div>
+      </div>
+      <div class="toggle" id="su-seller-toggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <button class="btn-g" id="signup-btn" onclick="doSignup()"><span data-i18n="createAccount">Create Account</span></button>
+    <p style="text-align:center;font-size:11px;color:var(--muted);line-height:1.5;" data-i18n="agreeTerms">By signing up you agree to Kumsika's guidelines &amp; privacy policy</p>
+    <p style="text-align:center;font-size:12px;color:var(--muted);">
+      <span data-i18n="haveAccount">Already have an account?</span> <span style="color:var(--G-bright);font-weight:700;cursor:pointer;" onclick="go('s-login','s-signup')" data-i18n="signIn">Sign In</span>
+    </p>
+  </div>
+</div>
+
+<!-- ████ HOME ████ -->
+<div class="screen" id="s-home">
+  <div class="topbar">
+    <div class="topbar-flag">
+      <div class="mw-flag">
+        <div class="mw-black"><div class="mw-sun" style="width:13px;height:13px;"></div></div>
+        <div class="mw-red"></div><div class="mw-green"></div>
+      </div>
+    </div>
+    <div class="topbar-brand"><em>Kum</em>sika</div>
+    <div class="topbar-btn" onclick="go('s-notifications','s-home')">🔔<div class="dot-badge" id="notif-badge"></div></div>
+    <div class="topbar-btn" onclick="go('s-messages','s-home')">💬<div class="dot-badge" id="msg-badge"></div></div>
+    <div class="topbar-btn" onclick="go('s-shelves','s-home')">🔖</div>
+  </div>
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="ico">🔍</span>
+      <input type="text" id="search-inp" data-i18n-placeholder="searchPlaceholder" placeholder="Search products in Malawi…" oninput="doSearch(this.value)" onfocus="showSearchHistory()"/>
+      <button class="search-filter-btn" onclick="openModal('filter-modal')">⚡ <span data-i18n="filter">Filter</span></button>
+    </div>
+  </div>
+  <div id="search-history-panel" style="display:none;padding:6px 14px 4px;flex-shrink:0;">
+    <div class="sh-header"><span data-i18n="recentSearches">Recent Searches</span><a onclick="clearSearchHistory()" data-i18n="clear">Clear</a></div>
+    <div class="sh-chips" id="search-history-chips"></div>
+  </div>
+  <div class="sort-bar">
+    <span class="sort-label">Sort:</span>
+    <button class="sort-pill on" id="sp-default" onclick="sortProducts('default',this)" data-i18n="sortDefault">Default</button>
+    <button class="sort-pill" id="sp-low" onclick="sortProducts('low',this)" data-i18n="sortLow">Price: Low↑</button>
+    <button class="sort-pill" id="sp-high" onclick="sortProducts('high',this)" data-i18n="sortHigh">Price: High↓</button>
+    <button class="sort-pill" id="sp-dist" onclick="sortProducts('district',this)" data-i18n="sortDist">By District</button>
+  </div>
+  <div class="cats stagger">
+    <button class="cat-chip on" onclick="catClick(this,'All')" data-i18n="all">All</button>
+    <button class="cat-chip" onclick="catClick(this,'Electronics')">📱 Electronics</button>
+    <button class="cat-chip" onclick="catClick(this,'Fashion')">👗 Fashion</button>
+    <button class="cat-chip" onclick="catClick(this,'Food')">🌽 Food</button>
+    <button class="cat-chip" onclick="catClick(this,'Vehicles')">🚗 Vehicles</button>
+    <button class="cat-chip" onclick="catClick(this,'Furniture')">🛋️ Furniture</button>
+    <button class="cat-chip" onclick="catClick(this,'Jobs')">💼 Jobs</button>
+    <button class="cat-chip" onclick="catClick(this,'Services')">🔧 Services</button>
+  </div>
+  <div class="scroll" id="home-scroll">
+    <div class="stats-ribbon stagger">
+      <div class="stat-cell"><div class="stat-num">28</div><div class="stat-lbl" data-i18n="statSellers">Districts</div></div>
+      <div class="stat-cell"><div class="stat-num">Live</div><div class="stat-lbl" data-i18n="statListings">Listings</div></div>
+      <div class="stat-cell"><div class="stat-num">🇲🇼</div><div class="stat-lbl" data-i18n="statSatisfied">Made in Malawi</div></div>
+    </div>
+    <div id="pwa-install-hint" style="display:none;">
+      <div class="pwa-install-bar" onclick="openModal('pwa-modal')">
+        <span>📲</span>
+        <div><div class="pwa-bar-text">Install Kumsika App</div><div class="pwa-bar-sub">Add to home screen for offline access</div></div>
+        <span style="color:var(--G-bright);">›</span>
+      </div>
+    </div>
+    <div class="sec"><h2>🔥 <span data-i18n="hotDeals">Hot Deals</span></h2><a onclick="catClick(document.querySelector('.cat-chip'),'All')" data-i18n="seeAll">See all</a></div>
+    <div class="h-scroll" id="h-scroll-container"></div>
+    <div class="hero-banner" onclick="go('s-shops','s-home')">
+      <div class="banner-icon">🏪</div>
+      <div class="banner-text">
+        <h3 data-i18n="browseShops">Browse Shops</h3>
+        <p data-i18n="browseShopsDesc">Discover verified sellers across Malawi</p>
+      </div>
+      <button class="banner-btn" onclick="event.stopPropagation();go('s-shops','s-home')" data-i18n="explore">Explore</button>
+    </div>
+    <div class="sec"><h2 data-i18n="latestListings">Latest Listings</h2><a onclick="catClick(document.querySelector('.cat-chip'),'All')">See all</a></div>
+    <div class="p-grid" id="listing-grid"></div>
+    <div style="height:8px;"></div>
+  </div>
+  <div class="nav">
+    <button class="nav-item on" id="ni-home" onclick="navTo('s-home','ni-home')"><span class="ni">🏠</span><span class="nl" id="nl-home" data-i18n="home">Home</span></button>
+    <button class="nav-item" id="ni-shops" onclick="navTo('s-shops','ni-shops')"><span class="ni">🏪</span><span class="nl" id="nl-shops" data-i18n="shops">Shops</span></button>
+    <div class="nav-fab-wrap"><button class="nav-fab" onclick="checkSellerAndSell()">＋</button></div>
+    <button class="nav-item" id="ni-messages" onclick="navTo('s-messages','ni-messages')"><span class="ni">💬</span><span class="nl" id="nl-messages" data-i18n="messages">Messages</span></button>
+    <button class="nav-item" id="ni-profile" onclick="navTo('s-profile','ni-profile')"><span class="ni">👤</span><span class="nl" id="nl-profile" data-i18n="profile">Profile</span></button>
+  </div>
+</div>
+
+<!-- ████ PRODUCT DETAIL ████ -->
+<div class="screen" id="s-detail">
+  <div class="det-gallery" id="detail-main-img-area">
+    <button class="det-back" onclick="back()" aria-label="Go back" style="position:absolute;top:14px;left:14px;z-index:10;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <button class="det-share" onclick="shareProduct()" style="position:absolute;top:14px;right:14px;z-index:10;">↗</button>
+  </div>
+  <div class="det-body scroll-free" style="flex:1;overflow-y:auto;">
+    <div class="det-cat-tag" id="det-cat">⚡ Electronics</div>
+    <div class="det-title" id="detail-name">iPhone 14 Pro Max</div>
+    <div class="det-price" id="detail-price">MK 750,000</div>
+    <div class="det-meta">
+      <span id="detail-meta">Negotiable · Lilongwe</span>
+      <div class="det-views">👁️ <span id="det-views-count">0</span></div>
+    </div>
+    <div class="det-wa-btn" id="detail-wa-btn" style="display:none;">
+      <span>💬</span><span data-i18n="chatWhatsApp">Chat on WhatsApp</span>
+    </div>
+    <div class="det-seller" id="det-seller-row" onclick="openShopFromDetail()">
+      <div class="seller-av"><span id="det-seller-av">🧑🏾</span></div>
+      <div class="seller-info">
+        <div class="sname" id="detail-seller-name">Seller</div>
+        <div class="smeta" id="detail-shop-name"></div>
+      </div>
+      <div class="seller-stars" style="font-size:11px;color:var(--muted);">›</div>
+    </div>
+    <p class="det-desc" id="detail-desc">Product description here.</p>
+    <button class="btn-g" id="detail-msg-btn" style="display:none;margin:0 14px 8px;" data-i18n="chatSeller">💬 Chat with Seller</button>
+  </div>
+  <div class="det-cta">
+    <button class="det-save" id="det-save-btn" onclick="toggleSave(this)">🤍</button>
+    <button class="btn-g" style="flex:1;" onclick="openChatFromDetail()" data-i18n="chatSeller">💬 Chat with Seller</button>
+  </div>
+</div>
+
+<!-- ████ SHOPS ████ -->
+<div class="screen" id="s-shops">
+  <div class="topbar">
+    <div class="topbar-flag"><div class="mw-flag"><div class="mw-black"><div class="mw-sun" style="width:13px;height:13px;"></div></div><div class="mw-red"></div><div class="mw-green"></div></div></div>
+    <div class="topbar-brand" data-i18n="shopsTitle">Shops</div>
+    <div class="topbar-btn" onclick="go('s-shop-create','s-shops')">＋</div>
+  </div>
+  <div class="shop-search"><input type="text" data-i18n-placeholder="searchShops" placeholder="Search shops…" oninput="searchShops(this.value)"/></div>
+  <div class="scroll" id="shops-scroll">
+    <div id="shops-list" style="padding:12px;"></div>
+  </div>
+  <div class="nav">
+    <button class="nav-item" id="ni-home2" onclick="navTo('s-home','ni-home')"><span class="ni">🏠</span><span class="nl" data-i18n="home">Home</span></button>
+    <button class="nav-item on" id="ni-shops2" onclick="navTo('s-shops','ni-shops')"><span class="ni">🏪</span><span class="nl" data-i18n="shops">Shops</span></button>
+    <div class="nav-fab-wrap"><button class="nav-fab" onclick="checkSellerAndSell()">＋</button></div>
+    <button class="nav-item" id="ni-msgs2" onclick="navTo('s-messages','ni-messages')"><span class="ni">💬</span><span class="nl" data-i18n="messages">Messages</span></button>
+    <button class="nav-item" id="ni-prof2" onclick="navTo('s-profile','ni-profile')"><span class="ni">👤</span><span class="nl" data-i18n="profile">Profile</span></button>
+  </div>
+</div>
+
+<!-- ████ SHOP DETAIL ████ -->
+<div class="screen" id="s-shop-detail">
+  <div style="height:180px;background:var(--surface2);position:relative;flex-shrink:0;overflow:hidden;" id="sd-cover">
+    <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a5c2a,#00cc00);display:flex;align-items:center;justify-content:center;font-size:60px;">🏪</div>
+    <button class="det-back" onclick="back()" style="position:absolute;top:14px;left:14px;" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <button class="det-share" onclick="showToast('🔗 Shop link copied!','g')" style="position:absolute;top:14px;right:14px;">↗</button>
+  </div>
+  <div class="scroll-free">
+    <div style="padding:14px 14px 10px;display:flex;align-items:center;gap:12px;">
+      <div style="width:50px;height:50px;border-radius:14px;background:var(--G-dim);border:1px solid rgba(0,200,0,.2);display:flex;align-items:center;justify-content:center;font-size:26px;" id="sd-logo">🏪</div>
+      <div style="flex:1;">
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--text);" id="sd-name">Shop Name</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="sd-meta">District · Category</div>
+      </div>
+      <div id="shop-sub-badge" class="badge badge-g">ACTIVE</div>
+    </div>
+    <div id="sd-subscription" style="display:none;font-size:11px;color:var(--G-bright);padding:0 14px 6px;font-weight:600;"></div>
+    <div class="shop-subs-warning" id="shop-subs-warning" style="display:none;">⚠️ This shop's subscription is not active.</div>
+    <div style="padding:0 14px 10px;font-size:13px;color:var(--text2);" id="sd-desc"></div>
+    <div style="font-size:12px;color:var(--muted);padding:0 14px 6px;">By <span id="sd-owner">Seller</span></div>
+    <div style="display:flex;gap:10px;padding:0 14px 14px;">
+      <button class="btn-g" id="sd-msg-btn" style="flex:1;display:none;" data-i18n="chat">💬 Chat</button>
+      <button class="btn-ghost" id="sd-wa-btn" style="flex:1;display:none;">WhatsApp</button>
+    </div>
+    <div class="p-sec-lbl" data-i18n="products">Products</div>
+    <div class="p-grid" id="sd-products" style="padding:8px 12px 20px;"></div>
+  </div>
+</div>
+
+<!-- ████ SHOP CREATE ████ -->
+<div class="screen" id="s-shop-create">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="openShop">Open Your Shop</h2>
+  </div>
+  <div class="scroll-free">
+    <div class="shop-form-wrap">
+      <div class="plan-card">
+        <div class="plan-name">🏪 Seller Plan</div>
+        <div class="plan-price">MK 5,000 <span>/month</span></div>
+        <div class="plan-feature">✅ Unlimited product listings</div>
+        <div class="plan-feature">✅ Verified seller badge</div>
+        <div class="plan-feature">✅ Analytics &amp; insights</div>
+        <div class="plan-feature">✅ Priority in search results</div>
+      </div>
+      <div class="fld"><label data-i18n="shopName">Shop Name</label><input type="text" id="shop-name-inp" placeholder="e.g. TechHub Lilongwe"/></div>
+      <div class="fld">
+        <label data-i18n="category">Category</label>
+        <select id="shop-category-inp">
+          <option value="">Choose category…</option>
+          <option>Electronics</option><option>Fashion</option><option>Food</option>
+          <option>Vehicles</option><option>Furniture</option><option>Services</option>
+          <option>Agriculture</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label data-i18n="district">Your District</label>
+        <select id="shop-district-inp">
+          <option value="">Choose district…</option>
+          <option>Lilongwe</option><option>Blantyre</option><option>Mzuzu</option>
+          <option>Zomba</option><option>Kasungu</option><option>Mangochi</option>
+          <option>Salima</option><option>Dedza</option><option>Karonga</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fld"><label>WhatsApp Number</label><input type="tel" id="shop-wa-inp" placeholder="+265 9XX XXX XXX"/></div>
+      <div class="fld"><label>Shop Description</label><textarea id="shop-desc-inp" placeholder="Describe your shop, what you sell, your specialties…" rows="3"></textarea></div>
+      <button class="btn-g" onclick="createShop()">🏪 Continue to Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ MY SHOP ████ -->
+<div class="screen" id="s-my-shop">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="myShop">My Shop</h2>
+    <div class="topbar-btn" onclick="go('s-sell','s-my-shop')">＋</div>
+  </div>
+  <div class="scroll-free" id="my-shop-content">
+    <div class="empty-state" style="padding:40px 20px;">
+      <div class="empty-icon">🏪</div>
+      <div class="empty-title">Loading shop…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ SELL ████ -->
+<div class="screen" id="s-sell">
+  <div class="sell-top">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="postListing">Post a Listing</h2>
+  </div>
+  <div class="scroll-free">
+    <div class="sell-sub-gate" id="sell-sub-gate">
+      <div class="empty-state">
+        <div class="empty-icon">🏪</div>
+        <div class="empty-title">Shop Subscription Required</div>
+        <div class="empty-desc">Your shop subscription is inactive. Activate it to post listings under your shop.<br><br>Or go back and sign in as an individual seller to post for free.</div>
+        <button class="btn-y" onclick="openModal('pay-modal')" style="margin-top:16px;">💳 Activate Shop Subscription</button>
+      </div>
+    </div>
+    <div id="sell-mode-label" style="display:none;background:var(--surface2);border-radius:var(--radius-sm);padding:10px 14px;margin:0 14px 8px;font-size:12px;color:var(--text2);"></div>
+    <div id="sell-form-wrap" class="sell-body">
+      <div>
+        <div class="f-label" data-i18n="photos">Photos</div>
+        <div class="photos-grid" id="photo-slots">
+          <div class="photo-slot" id="add-photo-btn" onclick="addPhoto()">
+            <span>📷</span><span data-i18n="addPhoto">Add Photo</span>
+          </div>
+        </div>
+        <div class="photo-counter">📷 <span class="pc-num" id="photo-count">0</span>/3 <span data-i18n="photos">photos</span></div>
+      </div>
+      <div class="ai-cta" onclick="aiWrite()">
+        <div class="ai-cta-icon">🤖</div>
+        <div class="ai-cta-text"><div class="at1" data-i18n="aiWrite">AI — Write for me</div><div class="at2" data-i18n="aiWriteDesc">Auto-fill listing with AI</div></div>
+        <div class="arr2">›</div>
+      </div>
+      <div class="fld"><label data-i18n="productTitle">Product Title</label><input type="text" id="s-title" placeholder="e.g. iPhone 14 Pro Max 256GB"/></div>
+      <div class="fld"><label data-i18n="description">Description</label><textarea id="s-desc" rows="3" placeholder="Describe your product in detail…"></textarea></div>
+      <div class="price-row">
+        <div class="fld"><label data-i18n="price">Price (MK)</label><input type="number" id="s-price" placeholder="0"/></div>
+        <div class="fld"><label data-i18n="category">Category</label>
+          <select id="s-category">
+            <option value="">Category…</option>
+            <option>Electronics</option><option>Fashion</option><option>Food</option>
+            <option>Vehicles</option><option>Furniture</option><option>Jobs</option>
+            <option>Services</option><option>Agriculture</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="fld">
+        <label data-i18n="location">Location</label>
+        <select id="s-location">
+          <option value="">Your district…</option>
+          <option>Lilongwe</option><option>Blantyre</option><option>Mzuzu</option>
+          <option>Zomba</option><option>Kasungu</option><option>Mangochi</option>
+          <option>Salima</option><option>Dedza</option><option>Karonga</option><option>Other</option>
+        </select>
+      </div>
+      <div class="toggle-row">
+        <div class="tl"><div class="tn" data-i18n="negotiable">Negotiable</div><div class="ts" data-i18n="negotiableDesc">Allow buyers to make offers</div></div>
+        <div class="toggle" id="s-negotiable"></div>
+      </div>
+      <div class="toggle-row">
+        <div class="tl"><div class="tn" data-i18n="delivery">Delivery Available</div><div class="ts" data-i18n="deliveryDesc">You can deliver to buyer</div></div>
+        <div class="toggle on" id="s-delivery"></div>
+      </div>
+      <button class="btn-g" id="post-btn" onclick="doPost()">🚀 <span data-i18n="postFree">Post Listing — Free</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ MESSAGES ████ -->
+<div class="screen" id="s-messages">
+  <div class="msgs-top">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="messages">Messages</h2>
+    <div class="topbar-btn" onclick="toast('✏️ New message','g')">✏️</div>
+  </div>
+  <div class="scroll-free" id="messages-list">
+    <div id="conv-list"></div>
+    <div id="messages-empty" style="display:none;">
+      <div class="empty-state"><div class="empty-icon">💬</div><div class="empty-title" data-i18n="noMessages">No Messages Yet</div><div class="empty-desc" data-i18n="noMessagesDesc">Chat with sellers to negotiate and buy.</div><div class="empty-action"><button class="btn-ghost" style="width:auto;padding:10px 24px;" onclick="go('s-home','s-messages')" data-i18n="browseListing">Browse Listings</button></div></div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nav-item" onclick="navTo('s-home','ni-home')"><span class="ni">🏠</span><span class="nl" data-i18n="home">Home</span></button>
+    <button class="nav-item" onclick="navTo('s-shops','ni-shops')"><span class="ni">🏪</span><span class="nl" data-i18n="shops">Shops</span></button>
+    <div class="nav-fab-wrap"><button class="nav-fab" onclick="checkSellerAndSell()">＋</button></div>
+    <button class="nav-item on"><span class="ni">💬</span><span class="nl" data-i18n="messages">Messages</span></button>
+    <button class="nav-item" onclick="navTo('s-profile','ni-profile')"><span class="ni">👤</span><span class="nl" data-i18n="profile">Profile</span></button>
+  </div>
+</div>
+
+<!-- ████ CHAT ████ -->
+<div class="screen" id="s-chat">
+  <div class="chat-top">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div style="flex:1;">
+      <div class="chat-top" style="padding:0;border:none;background:none;">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--G-dim);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;margin-left:8px;" id="chat-av">🧑🏾</div>
+        <div style="flex:1;margin-left:8px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);" id="chat-name">TechHub</div>
+          <div class="cmeta" id="chat-online">🟢 Online</div>
+        </div>
+      </div>
+    </div>
+    <div class="c-call" onclick="toast('📞 Calling…','g')">📞</div>
+  </div>
+  <div class="ai-suggestion">
+    <div class="ai-suggest-chip" onclick="quickReply('Is this still available?')" data-i18n="stillAvail">Still available?</div>
+    <div class="ai-suggest-chip" onclick="quickReply('Can you do a lower price?')" data-i18n="lowerPrice">Lower price?</div>
+    <div class="ai-suggest-chip" onclick="quickReply('Where are you located?')" data-i18n="location">Location?</div>
+    <div class="ai-suggest-chip" onclick="quickReply('I will pay cash today!')" data-i18n="payCash">Pay cash!</div>
+    <div class="ai-suggest-chip" onclick="quickReply('Can you deliver?')" data-i18n="canDeliver">Delivery?</div>
+  </div>
+  <div class="chat-box" id="chat-box">
+    <div class="msg them">
+      <div class="bubble">Hi! Welcome to TechHub Lilongwe 👋 How can I help you today?</div>
+      <div class="m-time">10:24 AM</div>
+    </div>
+    <div class="msg me">
+      <div class="bubble">I'm interested in the iPhone 14 Pro Max. Is it still available?</div>
+      <div class="m-time">10:25 AM ✓✓</div>
+    </div>
+    <div class="msg them">
+      <div class="bubble">Yes it is! Price is MK 750,000. Battery health 91%. Come see it in Lilongwe Area 2. 📱</div>
+      <div class="m-time">10:26 AM</div>
+    </div>
+    <div class="m-product" onclick="go('s-detail','s-chat')">
+      <div class="m-product-img">📱</div>
+      <div><div style="font-size:12px;font-weight:700;color:var(--text);">iPhone 14 Pro Max</div><div style="font-size:13px;font-weight:800;color:var(--G-bright);font-family:var(--font-display);">MK 750,000</div><div style="font-size:10px;color:var(--muted);">Tap to view</div></div>
+    </div>
+    <div class="typing-dots" id="typing-msg"><span></span><span></span><span></span></div>
+  </div>
+  <div class="chat-inp">
+    <div class="c-attach" onclick="toast('📎 Attach file')">📎</div>
+    <textarea class="c-text" id="c-input" rows="1" data-i18n-placeholder="msgPlaceholder" placeholder="Type a message…"></textarea>
+    <button class="c-send" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<!-- ████ SHELVES ████ -->
+<div class="screen" id="s-shelves">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="shelves">My Shelves</h2>
+    <div class="topbar-btn" onclick="createNewShelf()">＋</div>
+  </div>
+  <div class="shelf-scroll" id="shelves-list"></div>
+</div>
+
+<!-- ████ NOTIFICATIONS ████ -->
+<div class="screen" id="s-notifications">
+  <div class="msgs-top">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="notifications">Notifications</h2>
+    <div class="topbar-btn" onclick="clearNotifs()">✓</div>
+  </div>
+  <div class="scroll-free" id="notif-container"></div>
+</div>
+
+<!-- ████ PROFILE ████ -->
+<div class="screen" id="s-profile">
+  <div class="prof-header">
+    <div class="prof-av-wrap" onclick="triggerAvatarUpload()">
+      <div class="prof-av" id="profile-av-container"><span id="profile-av">🧑🏾</span></div>
+      <div class="prof-av-edit">✏️</div>
+      <div class="upload-spinner" id="avatar-upload-spinner"><div class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div></div>
+    </div>
+    <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this)"/>
+    <div class="prof-name" id="profile-name">Peter Mlandula</div>
+    <div class="prof-email" id="profile-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3b4b5e4f5e497b544f5e58534215564c">[email&#160;protected]</a> · Lilongwe</div>
+    <div class="prof-badges">
+      <span class="badge badge-g" id="verified-badge">✅ Verified</span>
+      <span class="badge badge-grey" id="seller-badge">🏪 Seller</span>
+      <span class="badge" style="background:rgba(150,0,200,.12);color:#cc88ff;border:1px solid rgba(150,0,200,.2);" id="admin-badge" style="display:none;">⚡ Admin</span>
+    </div>
+    <div class="prof-stats">
+      <div class="pstat"><div class="pstat-n" id="stat-listings">0</div><div class="pstat-l" data-i18n="listings">Listings</div></div>
+      <div class="pstat"><div class="pstat-n">89</div><div class="pstat-l" data-i18n="sales">Sales</div></div>
+      <div class="pstat"><div class="pstat-n" id="stat-views">0</div><div class="pstat-l" data-i18n="views">Views</div></div>
+    </div>
+  </div>
+  <div class="prof-scroll">
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="selling">Selling</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="go('s-my-shop','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(0,180,0,.1);">🏪</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="myShop">My Shop</div><div class="menu-row-sub" id="profile-shop-status">Active — expires Mar 2026</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-my-listings','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(0,120,200,.1);">📦</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="myListings">My Listings</div><div class="menu-row-sub" id="profile-listings-count">0 active listings</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="account">Account</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="go('s-edit-account','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(100,100,200,.1);">👤</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="editProfile">Edit Profile</div></div>
+          <div class="menu-row-right rv green" data-i18n="edit">Edit ›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-security','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(200,100,0,.1);">🔐</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="security">Security</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-lang','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(0,180,180,.1);">🌍</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="language">Language</div></div>
+          <div class="menu-row-right rv green" id="settings-lang-display">English ›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-settings','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(150,150,0,.1);">⚙️</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="settings">Settings</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="support">Support</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="go('s-tutorial','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(0,180,0,.08);">📖</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="howToUse">How to Use</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-report-bug','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(230,0,0,.08);">🐛</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="reportBug">Report a Bug</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" onclick="go('s-about','s-profile')">
+          <div class="menu-row-icon" style="background:rgba(150,0,200,.08);">ℹ️</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="aboutApp">About Kumsika</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+        <div class="menu-row" id="admin-menu-row" onclick="go('s-admin','s-profile')" style="display:none;">
+          <div class="menu-row-icon" style="background:rgba(150,0,200,.12);">⚡</div>
+          <div class="menu-row-body"><div class="menu-row-title" style="color:#cc88ff;">Admin Dashboard</div></div>
+          <div class="menu-row-right" style="color:#cc88ff;">›</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px;">
+      <button class="btn-r" onclick="openModal('logout-confirm')" data-i18n="signOut">🚪 Sign Out</button>
+    </div>
+    <div style="text-align:center;padding:10px 0 28px;font-size:11px;color:var(--muted);">Kumsika v5.0 · Powered by O-Techy Company</div>
+  </div>
+  <div class="nav">
+    <button class="nav-item" onclick="navTo('s-home','ni-home')"><span class="ni">🏠</span><span class="nl" data-i18n="home">Home</span></button>
+    <button class="nav-item" onclick="navTo('s-shops','ni-shops')"><span class="ni">🏪</span><span class="nl" data-i18n="shops">Shops</span></button>
+    <div class="nav-fab-wrap"><button class="nav-fab" onclick="checkSellerAndSell()">＋</button></div>
+    <button class="nav-item" onclick="navTo('s-messages','ni-messages')"><span class="ni">💬</span><span class="nl" data-i18n="messages">Messages</span></button>
+    <button class="nav-item on" id="ni-profile2"><span class="ni">👤</span><span class="nl" data-i18n="profile">Profile</span></button>
+  </div>
+</div>
+
+<!-- ████ EDIT ACCOUNT ████ -->
+<div class="screen" id="s-edit-account">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="editProfile">Edit Profile</h2>
+    <button class="btn-sm btn-sm-g" onclick="saveProfile()" style="padding:8px 14px;" data-i18n="save">Save</button>
+  </div>
+  <div class="scroll-free">
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px;padding-bottom:40px;">
+      <div style="text-align:center;padding:10px 0 6px;">
+        <div style="position:relative;display:inline-block;" onclick="triggerAvatarUpload()">
+          <div class="prof-av" style="width:80px;height:80px;font-size:36px;margin:0 auto;" id="edit-av-preview"><span id="edit-av-emoji">🧑🏾</span></div>
+          <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;background:var(--G);display:flex;align-items:center;justify-content:center;font-size:12px;border:2px solid var(--surface);">📷</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;" data-i18n="tapToChange">Tap to change photo</div>
+      </div>
+      <div class="fld"><label data-i18n="fullName">Full Name</label><input type="text" id="edit-name" placeholder="Your name"/></div>
+      <div class="fld"><label data-i18n="emailAddress">Email Address</label><input type="email" id="edit-email" placeholder="you@email.com"/></div>
+      <div class="fld"><label data-i18n="phoneNumber">Phone Number</label><input type="tel" id="edit-phone" placeholder="+265 9XX XXX XXX"/></div>
+      <div class="fld">
+        <label data-i18n="district">District</label>
+        <select id="edit-district">
+          <option>Lilongwe</option><option>Blantyre</option><option>Mzuzu</option>
+          <option>Zomba</option><option>Kasungu</option><option>Mangochi</option>
+          <option>Salima</option><option>Dedza</option><option>Karonga</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fld"><label data-i18n="bio">Bio</label><textarea id="edit-bio" rows="3" placeholder="Tell buyers about yourself…"></textarea></div>
+      <button class="btn-g" onclick="saveProfile()" data-i18n="saveChanges">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ SETTINGS ████ -->
+<div class="screen" id="s-settings">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="settings">Settings</h2>
+  </div>
+  <div class="scroll-free">
+    <div class="menu-section">
+      <div class="menu-label" style="color:var(--R);font-weight:800;">⭐ Premium</div>
+      <div class="menu-card">
+        <div class="menu-row prem-settings-row" onclick="go('s-premium-pay','s-settings')">
+          <div class="menu-row-icon" style="background:var(--R-dim);border:1px solid rgba(206,17,38,.2);font-size:20px;">⭐</div>
+          <div class="menu-row-body">
+            <div class="menu-row-title" style="color:var(--R);font-weight:800;">Pay for Premium Shop</div>
+            <div class="menu-row-sub">MK 5,000/month · Airtel Money or TNM Mpamba</div>
+          </div>
+          <div style="background:var(--R);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;flex-shrink:0;">UPGRADE</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="appearance">Appearance</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="setTheme('amoled')">
+          <div class="menu-row-icon" style="background:#000;border:1px solid var(--border2);">🖤</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="amoledBlack">🖤 Dark / AMOLED</div><div class="menu-row-sub" data-i18n="amoledDesc">Black theme — best for OLED</div></div>
+          <div class="rv green" id="chk-amoled">✓ Active</div>
+        </div>
+        <div class="menu-row" onclick="setTheme('malawi')">
+          <div class="menu-row-icon" style="background:#f5f5f5;border:1px solid #ddd;">☀️</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="lightMode">🇲🇼 Malawi Theme</div><div class="menu-row-sub" data-i18n="lightDesc">Red, White & Green — Default</div></div>
+          <div class="rv green" id="chk-malawi"></div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="notifications">Notifications</div>
+      <div class="menu-card">
+        <div class="menu-row">
+          <div class="menu-row-icon" style="background:rgba(0,180,0,.1);">🔔</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="pushNotif">Push Notifications</div></div>
+          <div class="toggle on" id="notif-toggle" onclick="this.classList.toggle('on');toast(this.classList.contains('on')?'🔔 Notifications on':'🔕 Notifications off')"></div>
+        </div>
+        <div class="menu-row">
+          <div class="menu-row-icon" style="background:rgba(37,211,102,.1);">💬</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="msgNotif">Message Alerts</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label">PWA</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="installPWA()">
+          <div class="menu-row-icon" style="background:rgba(0,80,200,.1);">📲</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="installApp">Install App</div><div class="menu-row-sub" data-i18n="installDesc">Add to home screen</div></div>
+          <div class="menu-row-right">›</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-label" data-i18n="data">Data</div>
+      <div class="menu-card">
+        <div class="menu-row" onclick="clearSearchHistory();toast('✓ Cache cleared','g')">
+          <div class="menu-row-icon" style="background:rgba(200,100,0,.1);">🗑️</div>
+          <div class="menu-row-body"><div class="menu-row-title" data-i18n="clearCache">Clear Cache</div><div class="menu-row-sub" data-i18n="clearCacheDesc">Clear search history &amp; cache</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ SECURITY ████ -->
+<div class="screen" id="s-security">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="security">Security</h2>
+  </div>
+  <div class="scroll-free">
+    <div style="padding:14px 0;">
+      <div class="security-item">
+        <div class="si-icon">🔐</div>
+        <div class="si-text" data-i18n="password">Password</div>
+        <div class="si-status">••••••••</div>
+      </div>
+      <div class="security-item" style="cursor:pointer;" onclick="showChangePassword()">
+        <div class="si-icon">🔑</div>
+        <div class="si-text" data-i18n="changePassword">Change Password</div>
+        <div class="menu-row-right">›</div>
+      </div>
+      <div class="security-item">
+        <div class="si-icon">📧</div>
+        <div class="si-text" id="security-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b3c3d6c7d6c1f3dcc7d6d0dbca9ddec4">[email&#160;protected]</a></div>
+        <div class="si-status" style="color:var(--G-bright);">✅ Verified</div>
+      </div>
+      <div class="security-item">
+        <div class="si-icon">📱</div>
+        <div class="si-text" data-i18n="twoFactor">Two-Factor Auth</div>
+        <div class="toggle" id="2fa-toggle" onclick="this.classList.toggle('on');toast(this.classList.contains('on')?'🔐 2FA enabled':'2FA disabled',this.classList.contains('on')?'g':'r')"></div>
+      </div>
+      <div class="security-item">
+        <div class="si-icon">🌐</div>
+        <div class="si-text" data-i18n="activeSessions">Active Sessions</div>
+        <div class="si-status">1 device</div>
+      </div>
+    </div>
+    <div style="padding:14px;">
+      <div class="fld" id="change-pw-form" style="display:none;gap:12px;margin-bottom:14px;">
+        <label data-i18n="currentPassword">Current Password</label>
+        <input type="password" id="old-pass" placeholder="Current password" class="f-input"/>
+        <label data-i18n="newPassword">New Password</label>
+        <input type="password" id="new-pass" placeholder="New password (min 6 chars)" class="f-input"/>
+        <button class="btn-g" onclick="changePassword()" data-i18n="updatePassword">Update Password</button>
+        <button class="btn-ghost" onclick="document.getElementById('change-pw-form').style.display='none'" data-i18n="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ MY LISTINGS ████ -->
+<div class="screen" id="s-my-listings">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="myListings">My Listings</h2>
+    <div class="topbar-btn" onclick="go('s-sell','s-my-listings')">＋</div>
+  </div>
+  <div class="scroll-free">
+    <div class="my-listings-grid" id="my-listings-grid"></div>
+    <div id="my-listings-empty" style="display:none;">
+      <div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title" data-i18n="noListings">No Listings Yet</div><div class="empty-desc" data-i18n="noListingsDesc">Post your first product listing.</div><div class="empty-action"><button class="btn-g" style="width:auto;padding:12px 24px;" onclick="go('s-sell','s-my-listings')">＋ <span data-i18n="postListing">Post Listing</span></button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ LANG ████ -->
+<div class="screen" id="s-lang">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="language">Language</h2>
+  </div>
+  <div class="lang-search"><input type="text" oninput="filterLangs(this.value)" data-i18n-placeholder="searchLang" placeholder="Search language…"/></div>
+  <div class="scroll-free" id="lang-list"></div>
+</div>
+
+<!-- ████ TUTORIAL ████ -->
+<div class="screen" id="s-tutorial">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="howToUse">How to Use</h2>
+  </div>
+  <div class="tutorial-inner">
+    <div id="tutorial-slide-wrap"></div>
+    <div class="tutorial-dots" id="tutorial-dots"></div>
+  </div>
+  <div class="tutorial-btns">
+    <button class="btn-g" id="tutorial-next" onclick="tutorialNext()">Next →</button>
+    <button class="tutorial-skip" id="tutorial-skip" onclick="back()" data-i18n="skip">Skip</button>
+  </div>
+</div>
+
+<!-- ████ REPORT BUG ████ -->
+<div class="screen" id="s-report-bug">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="reportBug">Report a Bug</h2>
+  </div>
+  <div class="scroll-free">
+    <div style="padding:16px;display:flex;flex-direction:column;gap:14px;padding-bottom:40px;">
+      <p style="font-size:13px;color:var(--muted2);line-height:1.5;" data-i18n="bugDesc">Help us improve Kumsika! Describe the issue you encountered.</p>
+      <div>
+        <div class="f-label" data-i18n="bugType">Bug Type</div>
+        <div class="bug-type-grid">
+          <div class="bug-type-chip selected" onclick="selectBugType('crash',this)"><div class="btc-icon">💥</div><div class="btc-label">App Crash</div></div>
+          <div class="bug-type-chip" onclick="selectBugType('ui',this)"><div class="btc-icon">🎨</div><div class="btc-label">UI Issue</div></div>
+          <div class="bug-type-chip" onclick="selectBugType('performance',this)"><div class="btc-icon">🐌</div><div class="btc-label">Slow / Laggy</div></div>
+          <div class="bug-type-chip" onclick="selectBugType('payment',this)"><div class="btc-icon">💳</div><div class="btc-label">Payment</div></div>
+        </div>
+      </div>
+      <div class="fld"><label data-i18n="bugDescription">Describe the issue</label><textarea id="bug-desc" rows="4" placeholder="What happened? What were you trying to do?"></textarea></div>
+      <div class="fld"><label data-i18n="deviceInfo">Your Device (optional)</label><input type="text" id="bug-device" placeholder="e.g. Samsung Galaxy A52"/></div>
+      <button class="btn-g" onclick="submitBugReport()" data-i18n="submitReport">📤 Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ ABOUT ████ -->
+<div class="screen" id="s-about">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 data-i18n="aboutApp">About Kumsika</h2>
+  </div>
+  <div class="scroll-free">
+    <!-- HERO -->
+    <div class="about-hero" style="padding:28px 18px 0;text-align:center;border-bottom:1px solid var(--border);">
+      <div class="about-logo">
+        <img src="assets/logo/kumsika-logo.svg" alt="Kumsika Logo" style="width:140px;height:auto;" loading="lazy"/>
+      </div>
+      <div class="about-name" style="margin-top:10px;"><em style="color:var(--R);font-style:normal;">Kum</em>sika</div>
+      <div class="about-version" style="font-size:12px;color:var(--muted);margin-top:4px;">Version 8.0.0 · O-Techy Company</div>
+      <div class="about-description" style="font-size:14px;color:var(--text2);line-height:1.6;margin-top:10px;">
+        Kumsika is Malawi's #1 digital marketplace — empowering every Malawian to buy and sell with confidence across all 28 districts. Built in 🇲🇼 Malawi for Malawians.
+      </div>
+      <div class="about-flag-stripe" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="about-stat-grid">
+      <div class="about-stat-card"><div class="about-stat-num">28</div><div class="about-stat-lbl">Districts Covered</div></div>
+      <div class="about-stat-card"><div class="about-stat-num">Growing</div><div class="about-stat-lbl">Active Sellers</div></div>
+      <div class="about-stat-card"><div class="about-stat-num">Real</div><div class="about-stat-lbl">Live Listings</div></div>
+      <div class="about-stat-card"><div class="about-stat-num">100%</div><div class="about-stat-lbl">Malawian Made</div></div>
+    </div>
+
+    <!-- COMPANY -->
+    <div class="p-sec-lbl" style="padding:4px 14px 6px;">About O-Techy Company</div>
+    <div class="menu-card" style="margin:0 14px 12px;">
+      <div style="padding:20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:14px;">
+          <img src="assets/logo/otechy-logo.jpg" alt="O-Techy Logo" style="width:90px;height:90px;border-radius:20px;object-fit:cover;box-shadow:0 4px 24px rgba(0,0,0,.18);margin-bottom:10px;" onerror="this.style.display='none'"/>
+          <div style="font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--text);">O-Techy Company</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">Your Ideas to Reality · Malawi 🇲🇼</div>
+          <a href="https://otechy.tiiny.site/" target="_blank" style="font-size:12px;color:var(--G-bright);margin-top:4px;font-weight:600;text-decoration:none;">🌐 otechy.tiiny.site</a>
+        </div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;">
+          O-Techy Company is a Malawian technology company dedicated to empowering businesses and individuals through innovative digital solutions. We believe in a connected, digitally enabled Malawi.
+        </div>
+      </div>
+    </div>
+
+    <!-- VISION & MISSION -->
+    <div class="p-sec-lbl" style="padding:4px 14px 6px;">Vision &amp; Mission</div>
+    <div class="about-mission-card" style="background:var(--R-dim);border-left-color:var(--R);">
+      <div class="about-mission-label">🎯 Our Vision</div>
+      <div class="about-mission-text">Empower every Malawian business digitally — from street vendors to large enterprises — giving them the tools to thrive in the digital economy.</div>
+    </div>
+    <div class="about-mission-card green" style="margin-top:0;">
+      <div class="about-mission-label">🚀 Our Mission</div>
+      <div class="about-mission-text">Connect buyers and sellers across all 28 districts of Malawi through a trusted, fast, and accessible marketplace — supporting Malawi's growing digital economy.</div>
+    </div>
+
+    <!-- WHAT WE OFFER -->
+    <div class="p-sec-lbl" style="padding:12px 14px 6px;">What Kumsika Offers</div>
+    <div class="menu-card" style="margin:0 14px 12px;">
+      <div class="menu-row" style="cursor:default;">
+        <div class="menu-row-icon" style="background:var(--R-dim);">🛍️</div>
+        <div class="menu-row-body"><div class="menu-row-title">Buy &amp; Sell Marketplace</div><div class="menu-row-sub">Products, services, vehicles, food and more</div></div>
+      </div>
+      <div class="menu-row" style="cursor:default;">
+        <div class="menu-row-icon" style="background:var(--G-dim);">🏪</div>
+        <div class="menu-row-body"><div class="menu-row-title">Seller Shop Creation</div><div class="menu-row-sub">Open your own verified shop for MK 5,000/month</div></div>
+      </div>
+      <div class="menu-row" style="cursor:default;">
+        <div class="menu-row-icon" style="background:rgba(37,211,102,.12);">💬</div>
+        <div class="menu-row-body"><div class="menu-row-title">WhatsApp &amp; In-App Chat</div><div class="menu-row-sub">Negotiate directly with sellers and buyers</div></div>
+      </div>
+      <div class="menu-row" style="cursor:default;">
+        <div class="menu-row-icon" style="background:var(--G-dim);">🌍</div>
+        <div class="menu-row-body"><div class="menu-row-title">Multi-Language Support</div><div class="menu-row-sub">English, Chichewa, Tumbuka, and more</div></div>
+      </div>
+      <div class="menu-row" style="cursor:default;">
+        <div class="menu-row-icon" style="background:var(--R-dim);">📱</div>
+        <div class="menu-row-body"><div class="menu-row-title">PWA — Works Offline</div><div class="menu-row-sub">Install on Android, browse without internet</div></div>
+      </div>
+      <div class="menu-row" style="cursor:default;border-bottom:none;">
+        <div class="menu-row-icon" style="background:rgba(245,166,35,.12);">💳</div>
+        <div class="menu-row-body"><div class="menu-row-title">Mobile Money Payments</div><div class="menu-row-sub">TNM Mpamba &amp; Airtel Money supported</div></div>
+      </div>
+    </div>
+
+    <!-- ALL 28 DISTRICTS -->
+    <div class="p-sec-lbl" style="padding:4px 14px 4px;">All 28 Districts of Malawi</div>
+    <div class="about-districts-wrap">
+      <span class="about-district-badge">📍 Lilongwe</span><span class="about-district-badge">📍 Blantyre</span>
+      <span class="about-district-badge">📍 Mzuzu</span><span class="about-district-badge">📍 Zomba</span>
+      <span class="about-district-badge">📍 Kasungu</span><span class="about-district-badge">📍 Mangochi</span>
+      <span class="about-district-badge">📍 Salima</span><span class="about-district-badge">📍 Dedza</span>
+      <span class="about-district-badge">📍 Karonga</span><span class="about-district-badge">📍 Ntchisi</span>
+      <span class="about-district-badge">📍 Dowa</span><span class="about-district-badge">📍 Nkhotakota</span>
+      <span class="about-district-badge">📍 Balaka</span><span class="about-district-badge">📍 Chiradzulu</span>
+      <span class="about-district-badge">📍 Chikwawa</span><span class="about-district-badge">📍 Nsanje</span>
+      <span class="about-district-badge">📍 Thyolo</span><span class="about-district-badge">📍 Mulanje</span>
+      <span class="about-district-badge">📍 Phalombe</span><span class="about-district-badge">📍 Machinga</span>
+      <span class="about-district-badge">📍 Mwanza</span><span class="about-district-badge">📍 Neno</span>
+      <span class="about-district-badge">📍 Rumphi</span><span class="about-district-badge">📍 Mzimba</span>
+      <span class="about-district-badge">📍 Chitipa</span><span class="about-district-badge">📍 Likoma</span>
+      <span class="about-district-badge">📍 Nkhata Bay</span><span class="about-district-badge">📍 Lilongwe Rural</span>
+    </div>
+
+    <!-- TEAM -->
+    <div class="p-sec-lbl" style="padding:8px 14px 6px;">Our Team</div>
+    <div class="menu-card" style="margin:0 14px 12px;">
+      <div class="menu-row" style="cursor:default;">
+        <div class="menu-row-icon" style="background:rgba(0,100,255,.12);font-size:22px;">👨‍💻</div>
+        <div class="menu-row-body">
+          <div class="menu-row-title">Peter Mlandula</div>
+          <div class="menu-row-sub">Lead Developer · UI/UX Designer · Software Engineer</div>
+        </div>
+      </div>
+      <div class="menu-row" style="cursor:default;">
+        <div class="menu-row-icon" style="background:rgba(255,50,100,.12);font-size:22px;">📊</div>
+        <div class="menu-row-body">
+          <div class="menu-row-title">Theodora Liva</div>
+          <div class="menu-row-sub">Marketing &amp; Finance Manager · UI/UX Contributor</div>
+        </div>
+      </div>
+      <div class="menu-row" style="cursor:default;">
+        <div class="menu-row-icon" style="background:rgba(0,200,100,.12);font-size:22px;">💻</div>
+        <div class="menu-row-body">
+          <div class="menu-row-title">Elisha Mkango</div>
+          <div class="menu-row-sub">Software Development · Testing</div>
+        </div>
+      </div>
+      <div class="menu-row" style="cursor:default;border-bottom:none;">
+        <div class="menu-row-icon" style="background:rgba(200,100,255,.12);font-size:22px;">🎨</div>
+        <div class="menu-row-body">
+          <div class="menu-row-title">Elijah Mkango</div>
+          <div class="menu-row-sub">Software Development · Creative Design</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="p-sec-lbl" style="padding:8px 14px 6px;" data-i18n="contact">Contact Us</div>
+    <div class="contact-row" onclick="window.open('mailto:otechy8@gmail.com','_blank')"><div class="ci">📧</div><div class="ct">otechy8@gmail.com</div></div>
+    <div class="contact-row" onclick="openWhatsApp('O-Techy','support','','265888258180')"><div class="ci">💬</div><div class="ct">WhatsApp: +265 888 258 180</div></div>
+    <div class="contact-row" onclick="window.open('https://otechy.tiiny.site','_blank')"><div class="ci">🌐</div><div class="ct">otechy.tiiny.site</div></div>
+    <div class="contact-row" onclick="window.open('tel:+265888258180','_blank')"><div class="ci">📞</div><div class="ct">+265 888 258 180 | +265 888 712 272 | +265 999 626 944</div></div>
+    <div class="contact-row" onclick="window.open('https://facebook.com/OtechyMW','_blank')"><div class="ci">📘</div><div class="ct">Facebook: @OtechyMW</div></div>
+    <div style="text-align:center;padding:24px 20px;font-size:11px;color:var(--muted);line-height:1.7;">
+      <div style="font-size:22px;margin-bottom:6px;">🇲🇼</div>
+      Made with ❤️ in Malawi<br/>
+      © 2026 O-Techy Company. All rights reserved.<br/>
+      <span style="color:var(--R);font-weight:700;">Kumsika v8.0.0</span>
+    </div>
+  </div>
+</div>
+
+<!-- ████ ADMIN ████ -->
+<div class="screen" id="s-admin">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 style="color:#cc88ff;">⚡ Admin Dashboard</h2>
+  </div>
+  <div class="admin-tabs">
+    <button class="admin-tab on" onclick="adminTab('overview',this)" data-i18n="overview">Overview</button>
+    <button class="admin-tab" onclick="adminTab('payments',this)">Payments</button>
+    <button class="admin-tab" onclick="adminTab('shops',this)" data-i18n="shops">Shops</button>
+    <button class="admin-tab" onclick="adminTab('products',this)" data-i18n="products">Products</button>
+  </div>
+  <div class="scroll-free">
+    <!-- Overview Panel -->
+    <div id="admin-overview-panel">
+      <div class="admin-overview">
+        <div class="admin-stat-card"><div class="asn" id="a-stat-shops">—</div><div class="asl">Total Shops</div></div>
+        <div class="admin-stat-card"><div class="asn" id="a-stat-products">—</div><div class="asl">Listings</div></div>
+        <div class="admin-stat-card"><div class="asn" id="a-stat-pending" style="color:#F5A623;">—</div><div class="asl">Pending Payments</div></div>
+        <div class="admin-stat-card"><div class="asn" id="a-stat-active" style="color:var(--G-bright);">—</div><div class="asl">Active Shops</div></div>
+      </div>
+      <div style="padding:14px;">
+        <button class="btn-g" onclick="loadAdminPanel()" style="margin-bottom:10px;">🔄 Refresh Data</button>
+      </div>
+    </div>
+    <!-- Payments Panel -->
+    <div id="admin-payments-panel" style="display:none;" class="scroll-free">
+      <div style="padding:14px 14px 6px;font-size:12px;color:var(--muted);">Review and approve payment proofs from sellers.</div>
+      <div id="admin-payments-list" style="padding:0 14px 20px;"></div>
+    </div>
+    <!-- Shops Panel -->
+    <div id="admin-shops-panel" style="display:none;" class="scroll-free">
+      <div id="admin-shops-list" style="padding:14px;"></div>
+    </div>
+    <!-- Products Panel -->
+    <div id="admin-products-panel" style="display:none;" class="scroll-free">
+      <div id="admin-products-list" style="padding:14px;color:var(--muted);font-size:13px;">Real product data from Supabase.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ PROOF SUBMITTED MODAL ████ -->
+<div class="confirm-modal" id="proof-submitted-modal">
+  <div class="confirm-card" style="text-align:center;">
+    <div style="font-size:50px;margin-bottom:12px;">🎉</div>
+    <h3 style="margin-bottom:8px;">Proof Submitted!</h3>
+    <p>Our team will review your payment within <strong>24 hours</strong>. Once approved, your shop will be activated automatically.</p>
+    <div style="margin:12px 0;padding:10px 12px;background:var(--G-dim);border:1px solid rgba(51,158,53,.2);border-radius:10px;font-size:12px;color:var(--G);font-weight:700;">
+      📞 Support: WhatsApp 0888 258 180
+    </div>
+    <div class="confirm-btns">
+      <button class="btn-g" onclick="closeModal('proof-submitted-modal')">✓ Got It!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ PREMIUM PAY SCREEN ████ -->
+<div class="screen" id="s-premium-pay">
+  <div class="page-header">
+    <button class="back-btn" onclick="back()" aria-label="Go back"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <h2 style="font-family:var(--font-display);font-size:16px;">⭐ Premium Shop</h2>
+  </div>
+  <div class="scroll-free" style="padding-bottom:40px;">
+
+    <!-- Hero -->
+    <div class="prem-hero">
+      <div class="prem-flag-stripe"></div>
+      <div class="prem-hero-body">
+        <div class="prem-crown">🏪</div>
+        <div class="prem-title">Open Your Shop</div>
+        <div class="prem-sub">Verified shop · Unlimited listings · All 28 districts</div>
+      </div>
+    </div>
+
+    <!-- Plan selector -->
+    <div style="padding:16px 14px 0;">
+      <div class="prem-section-label">CHOOSE YOUR PLAN</div>
+      <div class="prem-plans">
+        <div class="prem-plan-card active" id="pp-month" onclick="setPremPlan('month')">
+          <div class="pp-badge">Popular</div>
+          <div class="pp-period">Monthly</div>
+          <div class="pp-price">MK 5,000</div>
+          <div class="pp-note">Per 30 days</div>
+          <div class="pp-check" id="ppc-month">✓</div>
+        </div>
+        <div class="prem-plan-card" id="pp-year" onclick="setPremPlan('year')">
+          <div class="pp-badge save">Save MK 20k!</div>
+          <div class="pp-period">Yearly</div>
+          <div class="pp-price">MK 40,000</div>
+          <div class="pp-note">= MK 3,333/mo</div>
+          <div class="pp-check" id="ppc-year"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Benefits -->
+    <div style="padding:16px 14px 0;">
+      <div class="prem-section-label">WHAT YOU GET</div>
+      <div class="prem-benefits">
+        <div class="prem-benefit"><span class="pb-icon">✅</span><span class="pb-text">Verified shop with official green badge</span></div>
+        <div class="prem-benefit"><span class="pb-icon">📦</span><span class="pb-text">Unlimited product listings</span></div>
+        <div class="prem-benefit"><span class="pb-icon">🔝</span><span class="pb-text">Priority placement in search results</span></div>
+        <div class="prem-benefit"><span class="pb-icon">📊</span><span class="pb-text">Sales & views analytics dashboard</span></div>
+        <div class="prem-benefit"><span class="pb-icon">💬</span><span class="pb-text">Direct buyer leads via WhatsApp</span></div>
+        <div class="prem-benefit"><span class="pb-icon">🇲🇼</span><span class="pb-text">Visible across all 28 districts</span></div>
+      </div>
+    </div>
+
+    <!-- Payment method -->
+    <div style="padding:16px 14px 0;">
+      <div class="prem-section-label">PAYMENT METHOD</div>
+      <div class="prem-method-tabs">
+        <div class="pmt-tab active" id="pmt-tnm" onclick="setPayMethod('tnm')">
+          <div class="pmt-icon" style="background:linear-gradient(135deg,#002299,#0044cc);">📱</div>
+          <div class="pmt-name">TNM Mpamba</div>
+        </div>
+        <div class="pmt-tab" id="pmt-airtel" onclick="setPayMethod('airtel')">
+          <div class="pmt-icon" style="background:linear-gradient(135deg,#bb0000,#ee2222);">📲</div>
+          <div class="pmt-name">Airtel Money</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div style="padding:12px 14px 0;">
+      <div class="prem-section-label">HOW TO PAY</div>
+      <div class="prem-instructions" id="pay-instructions-card">
+        <div class="pi-amount-row">
+          <div class="pi-amount-label">Amount to Send</div>
+          <div class="pi-amount-value" id="pi-amount-display">MK 5,000</div>
+        </div>
+        <div class="pi-steps">
+          <div class="pi-step">
+            <div class="pi-step-num">1</div>
+            <div class="pi-step-text" id="pi-step1">Open <strong>TNM Mpamba</strong> on your phone</div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">2</div>
+            <div class="pi-step-text">Select <strong>"Send Money"</strong> or <strong>"Pay Business"</strong></div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">3</div>
+            <div class="pi-step-text">Send to this number (tap to copy 👇):</div>
+          </div>
+        </div>
+        <!-- The BIG phone number -->
+        <div class="pi-number-card" id="pi-number-card" onclick="copyPayNumber()">
+          <div class="pi-network-badge" id="pi-network-badge">TNM Mpamba</div>
+          <div class="pi-phone" id="pi-phone-display">0999 626 944</div>
+          <div class="pi-copy-hint">👆 Tap to copy number</div>
+        </div>
+        <div class="pi-steps" style="margin-top:4px;">
+          <div class="pi-step">
+            <div class="pi-step-num">4</div>
+            <div class="pi-step-text">Enter exact amount: <strong id="pi-amount-step" style="color:var(--R);">MK 5,000</strong></div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">5</div>
+            <div class="pi-step-text">Reference/note: <strong>Your name + "Kumsika"</strong></div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">6</div>
+            <div class="pi-step-text">Take a <strong>screenshot</strong> of the confirmation SMS</div>
+          </div>
+          <div class="pi-step">
+            <div class="pi-step-num">7</div>
+            <div class="pi-step-text">Upload screenshot below — approved within <strong>24 hours</strong> ✅</div>
+          </div>
+        </div>
+        <div class="pi-alt-note" id="pi-alt-note">
+          💡 You can also pay to: <strong>0888 258 180</strong> (same account)
+        </div>
+      </div>
+    </div>
+
+    <!-- Your details form -->
+    <div style="padding:12px 14px 0;">
+      <div class="prem-section-label">YOUR PAYMENT DETAILS</div>
+      <div class="prem-form-card">
+        <div class="fld" style="margin-bottom:12px;">
+          <label>Your Mobile Money Number *</label>
+          <input type="tel" id="proof-sender-number" placeholder="e.g. 0888 123 456 or 0999 123 456"
+                 class="f-input" oninput="validateProofForm()"/>
+          <div class="f-err" id="proof-num-err">Please enter your phone number (min 9 digits)</div>
+        </div>
+        <div class="fld" style="margin-bottom:12px;">
+          <label>Transaction Reference / ID <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+          <input type="text" id="proof-txn-ref" placeholder="e.g. TXN1234567890" class="f-input"/>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px;">Found in your Airtel/TNM confirmation SMS</div>
+        </div>
+        <div class="fld">
+          <label>Payment Screenshot *</label>
+          <div class="proof-upload-zone" id="proof-upload-zone" onclick="triggerProofUpload()">
+            <div id="proof-upload-inner">
+              <div class="puz-icon">📷</div>
+              <div class="puz-title">Tap to upload screenshot</div>
+              <div class="puz-sub">JPEG or PNG · max 5MB</div>
+            </div>
+            <div id="proof-preview-inner" style="display:none;text-align:center;">
+              <img id="proof-img-preview" class="puz-preview-img" src="" alt="Payment proof"/>
+              <div class="puz-change">📷 Tap to change screenshot</div>
+            </div>
+          </div>
+          <input type="file" id="proof-file-input" accept="image/*" style="display:none;" onchange="handleProofFile(this)"/>
+          <div class="f-err" id="proof-img-err">Please upload your payment screenshot</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div style="padding:14px 14px 0;">
+      <button class="btn-g" id="submit-proof-btn" onclick="submitPaymentProof()" disabled style="opacity:.4;">
+        📤 Submit Payment Proof
+      </button>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.7;">
+        We manually review every payment within <strong style="color:var(--text2);">24 hours</strong>.<br/>
+        You'll be notified when your shop is activated. 🇲🇼
+      </div>
+    </div>
+
+    <!-- WhatsApp help -->
+    <div style="padding:12px 14px 0;">
+      <button class="btn-wa" onclick="openWhatsApp('Kumsika','Premium Activation','','265888258180')">
+        💬 Questions? Chat us on WhatsApp
+      </button>
+    </div>
+
+    <div style="text-align:center;padding:20px 14px 8px;font-size:11px;color:var(--muted);">
+      Already submitted your proof? We'll approve within 24 hours. 🕐
+    </div>
+  </div>
+</div>
+</div><!-- /shell -->
+
+
+
+
+<!-- ══════════════════════════════════════════════════════════
+     EXTERNAL SCRIPTS — Modular Architecture
+     Replace SUPABASE_URL + SUPABASE_ANON_KEY in js/supabase.js
+     Replace CLOUDINARY_CONFIG in js/cloudinary.js
+══════════════════════════════════════════════════════════ -->
+
+<!-- Supabase SDK — async so it never blocks the page if CDN is slow/offline -->
+<script>
+  // Load Supabase SDK dynamically so it never blocks rendering
+  (function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.onload = function() {
+      window._supabaseSDK = window.supabase || null;
+      window._supabaseReady = true;
+    };
+    s.onerror = function() {
+      // CDN failed — app runs in offline/guest mode
+      window._supabaseSDK = null;
+      window._supabaseReady = true;
+    };
+    document.head.appendChild(s);
+  })();
+</script>
+
+<!-- Kumsika Modules — defer so they never block DOM rendering -->
+<script src="js/cloudinary.js" defer></script>
+<script src="js/supabase.js" defer></script>
+<script src="js/ui.js" defer></script>
+<script src="js/auth.js" defer></script>
+<script src="js/products.js" defer></script>
+<script src="js/shop.js" defer></script>
+<script src="js/app.js" defer></script>
+<script src="js/fixes.js" defer></script>
+
+</body>
+</html>
