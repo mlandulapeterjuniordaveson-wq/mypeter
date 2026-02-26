@@ -12,8 +12,8 @@
  */
 
 const CLOUDINARY_CONFIG = {
-  cloudName    : 'dvyepcieu',          // ← REPLACE with your Cloudinary cloud name
-  uploadPreset : 'Kumsika',          // ← REPLACE with your unsigned upload preset name
+  cloudName    : 'dvyepcieu',      // Kumsika cloud name — already configured ✓
+  uploadPreset : 'Kumsika',        // Kumsika unsigned upload preset — already configured ✓
   baseUrl      : 'https://res.cloudinary.com',
 };
 

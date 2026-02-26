@@ -1,5 +1,5 @@
 /**
- * KUMSIKA — PRODUCTS MODULE v8 FIXED
+ * KUMSIKA — PRODUCTS MODULE v13 FIXED
  * Real data from Supabase. No mock data shown to users.
  * O-Techy Company 2026
  */
@@ -8,7 +8,7 @@
 var PRODUCTS = [];
 var displayedProducts = [];
 var userProducts      = [];
-var currentDetailProduct = null; // global - shared with ui.js
+// currentDetailProduct is declared in ui.js — do NOT re-declare here (causes SyntaxError)
 let searchHistory     = JSON.parse(localStorage.getItem('kumsika_search_history') || '[]');
 
 const EMOJI_MAP = {

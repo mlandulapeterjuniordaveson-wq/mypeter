@@ -328,4 +328,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-console.log('[Kumsika Fixes v10] Loaded ✓');
+console.log('[Kumsika Fixes v13] Loaded ✓');

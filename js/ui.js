@@ -1,5 +1,5 @@
 /**
- * KUMSIKA — UI MODULE
+ * KUMSIKA — UI MODULE v13
  * ────────────────────────────────────────────────────────────
  * Navigation, Toast, Theme, PWA, i18n, Avatar upload,
  * Profile, Messages, Notifications, Admin, Shelves.
@@ -636,14 +636,8 @@ async function submitBugReport() {
 }
 
 // ─── ADMIN DASHBOARD ──────────────────────────────────────────────
-const MOCK_USERS = [
-  // NOTE: This is placeholder mock data for UI display only.
-  // Real user management should be done via the Supabase dashboard.
-  { id:'u1', name:'Admin (You)', email:'admin@kumsika.app', district:'Lilongwe', isSeller:true,  isAdmin:true,  verified:true  },
-  { id:'u2', name:'Grace Phiri',    email:'grace@example.com',  district:'Mzuzu',    isSeller:true,  isAdmin:false, verified:true  },
-  { id:'u3', name:'John Banda',     email:'john@example.com',   district:'Blantyre', isSeller:true,  isAdmin:false, verified:false },
-  { id:'u4', name:'Mary Gondwe',    email:'mary@example.com',   district:'Kasungu',  isSeller:false, isAdmin:false, verified:true  },
-];
+// No mock users — real profiles loaded from Supabase
+let _adminUsersCache = [];
 
 function adminTab(tab, btn) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('on'));
@@ -655,6 +649,7 @@ function adminTab(tab, btn) {
   if (tab === 'payments') { try { loadAdminPanel(); } catch(e) {} }
   else if (tab === 'shops')    { try { renderAdminShops(); } catch(e) {} }
   else if (tab === 'products') { try { renderAdminProducts(); } catch(e) {} }
+  else if (tab === 'users')    { try { renderAdminUsers(); } catch(e) {} }
   // Update overview stats
   if (tab === 'overview') {
     const shEl = document.getElementById('a-stat-shops');
@@ -666,24 +661,7 @@ function adminTab(tab, btn) {
   }
 }
 
-function renderAdminShops() {
-  const c = document.getElementById('admin-shops-list');
-  if (!c) return;
-  c.innerHTML = SHOPS.map(s => `
-    <div class="admin-item">
-      <div class="admin-item-icon">${s.emoji}</div>
-      <div class="admin-item-body">
-        <div class="admin-item-name">${escHtml(s.name)}</div>
-        <div class="admin-item-meta">${s.district} · ${s.status.toUpperCase()} · ${s.products} products</div>
-      </div>
-      <div class="admin-item-actions">
-        ${s.status === 'active'
-          ? `<button class="btn-sm btn-sm-y" onclick="adminAction('suspendShop','${s.id}','${escHtml(s.name)}')">Suspend</button>`
-          : `<button class="btn-sm btn-sm-g" onclick="adminAction('activateShop','${s.id}','${escHtml(s.name)}')">Activate</button>`}
-        <button class="btn-sm btn-sm-r" onclick="adminAction('deleteShop','${s.id}','${escHtml(s.name)}')">Delete</button>
-      </div>
-    </div>`).join('');
-}
+// renderAdminShops() is defined in shop.js — do NOT re-define here (duplicate function error)
 
 function renderAdminProducts() {
   const c = document.getElementById('admin-products-list');
@@ -701,19 +679,34 @@ function renderAdminProducts() {
     </div>`).join('');
 }
 
-function renderAdminUsers() {
+async function renderAdminUsers() {
   const c = document.getElementById('admin-users-list');
   if (!c) return;
-  c.innerHTML = MOCK_USERS.map(u => `
+  c.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto 8px;"></div>Loading users…</div>';
+  try {
+    const db = getDB();
+    if (db) {
+      const { data, error } = await db.from('profiles').select('*').order('created_at', { ascending: false }).limit(50);
+      if (error) throw error;
+      _adminUsersCache = data || [];
+    }
+  } catch(e) {
+    console.warn('[renderAdminUsers]', e);
+  }
+  if (!_adminUsersCache.length) {
+    c.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">No users yet. Manage via Supabase dashboard.</div>';
+    return;
+  }
+  c.innerHTML = _adminUsersCache.map(u => `
     <div class="admin-item">
       <div class="admin-item-icon">👤</div>
       <div class="admin-item-body">
-        <div class="admin-item-name">${escHtml(u.name)}</div>
-        <div class="admin-item-meta">${u.email} · ${u.district}${u.isAdmin ? ' · 🔑 Admin' : ''}</div>
+        <div class="admin-item-name">${escHtml(u.full_name || u.email || 'User')}</div>
+        <div class="admin-item-meta">${escHtml(u.email||'')} · ${escHtml(u.district||'')}${u.is_admin ? ' · 🔑 Admin' : ''}${u.is_seller ? ' · 🏪 Seller' : ''}</div>
       </div>
       <div class="admin-item-actions">
-        <span class="badge ${u.verified ? 'badge-g' : 'badge-grey'}">${u.verified ? '✓ Verified' : 'Unverified'}</span>
-        ${!u.isAdmin ? `<button class="btn-sm btn-sm-r" onclick="adminAction('banUser','${u.id}','${escHtml(u.name)}')">Ban</button>` : ''}
+        <span class="badge ${u.is_verified ? 'badge-g' : 'badge-grey'}">${u.is_verified ? '✓ Verified' : 'Unverified'}</span>
+        ${!u.is_admin ? `<button class="btn-sm btn-sm-r" onclick="adminAction('banUser','${u.id}','${escHtml(u.full_name||u.email||'User')}')">Ban</button>` : ''}
       </div>
     </div>`).join('');
 }
